@@ -60,3 +60,14 @@ h1{margin:0;font-size:clamp(48px,6.2vw,82px);line-height:.97;letter-spacing:-.05
 .maze-cell{aspect-ratio:1;border-radius:2px;background:#10152a}.maze-cell.wall{background:#2b3045}.maze-cell.visited{background:#28305a}.maze-cell.path{background:#7c74ff;box-shadow:0 0 8px rgba(124,116,255,.35)}.maze-cell.start{background:#55d69c}.maze-cell.end{background:#ffb86b}
 .memory-tile{will-change:transform}.tic-cell{transition:background .15s ease}
 @media (max-width:650px){.game-topline{gap:18px}.game-topline .status-copy{width:100%;order:3}.sudoku-cell{font-size:12px}.maze-grid{gap:1px;padding:5px}}
+
+/* Portfolio micro-interactions */
+.project{transition:transform .25s ease,border-color .25s ease,background .25s ease;will-change:transform}
+.project:hover{transform:translateY(-5px);border-color:rgba(132,125,255,.22);background:rgba(255,255,255,.035)}
+.project h3{transition:transform .22s ease}.project:hover h3{transform:translateX(2px)}
+.btn,.nav-button,.skill{transition:transform .2s ease,background .2s ease,border-color .2s ease}
+.btn:hover{transform:translateY(-2px)}
+.skill{transition:transform .18s ease,border-color .18s ease,background .18s ease}.skill:hover{transform:translateY(-2px);border-color:rgba(255,255,255,.16);background:rgba(255,255,255,.045)}
+.timeline-item{animation:fadeUp .6s ease both}.timeline-item:nth-child(2){animation-delay:.08s}.timeline-item:nth-child(3){animation-delay:.16s}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.timeline-item,.project,.skill,.btn,.nav-button{animation:none;transition:none}}
