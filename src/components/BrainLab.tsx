@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { ArrowUpDown, Brain, Check, Clock3, Grid2X2, Lightbulb, RotateCcw, Sun, Trophy, Zap } from 'lucide-react';
 
@@ -50,15 +50,44 @@ function Memory() {
 }
 
 function Tic() {
-  const [board,setBoard]=useState<(string|null)[]>([...emptyBoard]);const [thinking,setThinking]=useState(false);const w=winner(board);
-  const move=(i:number)=>{if(board[i]||w||thinking)return;const next=[...board];next[i]='X';setBoard(next);if(winner(next))return;setThinking(true);window.setTimeout(()=>{const pick=aiMove(next);const out=[...next];out[pick]='O';setBoard(out);setThinking(false)},240)};
+  type Result='win'|'loss'|'draw';
+  const [board,setBoard]=useState<(string|null)[]>([...emptyBoard]);
+  const [thinking,setThinking]=useState(false);
+  const [stats,setStats]=useState(()=>({
+    wins:Number(localStorage.getItem('brain-tic-wins')||0),
+    losses:Number(localStorage.getItem('brain-tic-losses')||0),
+    draws:Number(localStorage.getItem('brain-tic-draws')||0),
+    streak:Number(localStorage.getItem('brain-tic-streak')||0)
+  }));
+  const [last,setLast]=useState('');
+  const w=winner(board);
+  const record=(result:Result)=>{
+    setStats(prev=>{
+      const next={wins:prev.wins+(result==='win'?1:0),losses:prev.losses+(result==='loss'?1:0),draws:prev.draws+(result==='draw'?1:0),streak:result==='win'?prev.streak+1:0};
+      localStorage.setItem('brain-tic-wins',String(next.wins));localStorage.setItem('brain-tic-losses',String(next.losses));localStorage.setItem('brain-tic-draws',String(next.draws));localStorage.setItem('brain-tic-streak',String(next.streak));
+      return next;
+    });
+  };
+  const move=(i:number)=>{
+    if(board[i]||w||thinking)return;
+    const next=[...board];next[i]='X';const humanResult=winner(next);setBoard(next);
+    if(humanResult){setLast(humanResult==='X'?'You win! 🔥':'Draw — rematch?');record(humanResult==='X'?'win':'draw');return;}
+    setThinking(true);
+    window.setTimeout(()=>{
+      const pick=aiMove(next),out=[...next];out[pick]='O';const result=winner(out);setBoard(out);setThinking(false);
+      if(result){setLast(result==='O'?'AI wins — run it back.':'Draw — rematch?');record(result==='O'?'loss':'draw');}
+    },220);
+  };
+  const reset=()=>{setBoard([...emptyBoard]);setThinking(false);setLast('');};
   return <div className="game-panel">
-    <div className="game-topline"><div><span>You</span><strong>X</strong></div><div><span>AI</span><strong>O</strong></div><div><span>Engine</span><strong>Minimax</strong></div></div>
-    <div className="tic-board">{board.map((v,i)=><motion.button whileHover={{backgroundColor:'rgba(255,255,255,.055)'}} className={'tic-cell '+(v||'')} onClick={()=>move(i)} key={i}>{v||''}</motion.button>)}</div>
-    <div className="game-actions"><span className="game-status">{w==='draw'?'Draw.':w?w+' wins.':thinking?'AI thinking…':'Your move.'}</span><button className="lab-button" onClick={()=>{setBoard([...emptyBoard]);setThinking(false)}}><RotateCcw size={13}/> New game</button></div>
+    <div className="game-topline">
+      <div><span>Wins</span><strong>{stats.wins}</strong></div><div><span>Losses</span><strong>{stats.losses}</strong></div>
+      <div><span>Streak</span><strong>{stats.streak} 🔥</strong></div><div><span>Engine</span><strong>Minimax</strong></div>
+    </div>
+    <div className="tic-board">{board.map((v,i)=><motion.button whileHover={{backgroundColor:'rgba(255,255,255,.055)',scale:1.02}} whileTap={{scale:.95}} className={'tic-cell '+(v||'')} onClick={()=>move(i)} key={i}>{v||''}</motion.button>)}</div>
+    <div className="game-actions"><span className="game-status">{last || (w==='draw'?'Draw.':w?w+' wins.':thinking?'AI thinking…':'Your move — build a streak.')}</span><button className="lab-button" onClick={reset}><RotateCcw size={13}/> Rematch</button></div>
   </div>;
 }
-
 function Reaction() {
   const [state,setState]=useState<'idle'|'armed'|'go'|'result'>('idle'),[started,setStarted]=useState(0),[score,setScore]=useState<number|null>(null),[best,setBest]=useState<number|null>(null);
   useEffect(()=>{const b=Number(localStorage.getItem('brain-reaction-best')||0);if(b)setBest(b)},[]);
@@ -115,34 +144,31 @@ function canMove2048(board:Board2048){
 }
 function Game2048(){
   const [board,setBoard]=useState<Board2048>(()=>empty2048());
-  const [score,setScore]=useState(0);
-  const [best,setBest]=useState(()=>Number(localStorage.getItem('brain-2048-best')||0));
-  const [over,setOver]=useState(false);
-  const reset=()=>{setBoard(empty2048());setScore(0);setOver(false)};
+  const [score,setScore]=useState(0),[best,setBest]=useState(()=>Number(localStorage.getItem('brain-2048-best')||0));
+  const [over,setOver]=useState(false),[moves,setMoves]=useState(0);
+  const [undo,setUndo]=useState<{board:Board2048;score:number;over:boolean}|null>(null);
+  const touchStart=useRef<{x:number;y:number}|null>(null);
+  const makeMove=(dir:'L'|'R'|'U'|'D')=>{
+    if(over)return;const result=moved2048(board,dir);if(!result.changed)return;
+    const next=[...result.next];addRandom2048(next);setUndo({board:[...board],score,over});setBoard(next);
+    const s=score+result.gained;setScore(s);setMoves(m=>m+1);
+    if(s>best){setBest(s);localStorage.setItem('brain-2048-best',String(s))}
+    setOver(!canMove2048(next));
+  };
+  const reset=()=>{setBoard(empty2048());setScore(0);setMoves(0);setOver(false);setUndo(null)};
+  const undoMove=()=>{if(!undo)return;setBoard(undo.board);setScore(undo.score);setOver(undo.over);setUndo(null);setMoves(m=>Math.max(0,m-1));};
   useEffect(()=>{
-    const onKey=(e:KeyboardEvent)=>{
-      const key=e.key.toLowerCase();
-      const map:Record<string,'L'|'R'|'U'|'D'>={arrowleft:'L',a:'L',arrowright:'R',d:'R',arrowup:'U',w:'U',arrowdown:'D',s:'D'};
-      if(!map[key])return;
-      e.preventDefault();
-      const result=moved2048(board,map[key]);
-      if(!result.changed)return;
-      const next=[...result.next];addRandom2048(next);setBoard(next);
-      const s=score+result.gained;setScore(s);
-      if(s>best){setBest(s);localStorage.setItem('brain-2048-best',String(s))}
-      setOver(!canMove2048(next));
-    };
-    window.addEventListener('keydown',onKey);
-    return()=>window.removeEventListener('keydown',onKey);
-  },[board,score,best]);
-  return <div className="game-panel">
-    <div className="game-topline"><div><span>Score</span><strong>{score}</strong></div><div><span>Best</span><strong>{best}</strong></div><div><span>Controls</span><strong>WASD / arrows</strong></div></div>
-    {over&&<div className="game-over">No moves left. Start a new board.</div>}
-    <div className="game-2048">{board.map((v,i)=><motion.div layout key={i} className={'tile-2048 v-'+v}>{v||''}</motion.div>)}</div>
-    <div className="game-actions"><button className="lab-button" onClick={reset}><RotateCcw size={13}/> New board</button><span className="game-status">Combine equal tiles to reach 2048.</span></div>
-  </div>;
+    const onKey=(e:KeyboardEvent)=>{const key=e.key.toLowerCase();const map:Record<string,'L'|'R'|'U'|'D'>={arrowleft:'L',a:'L',arrowright:'R',d:'R',arrowup:'U',w:'U',arrowdown:'D',s:'D'};if(!map[key])return;e.preventDefault();makeMove(map[key]);};
+    window.addEventListener('keydown',onKey);return()=>window.removeEventListener('keydown',onKey);
+  },[board,score,best,over]);
+  const onTouchStart=(e:React.TouchEvent)=>{const t=e.changedTouches[0];touchStart.current={x:t.clientX,y:t.clientY};};
+  const onTouchEnd=(e:React.TouchEvent)=>{const s=touchStart.current;if(!s)return;const t=e.changedTouches[0],dx=t.clientX-s.x,dy=t.clientY-s.y;touchStart.current=null;if(Math.max(Math.abs(dx),Math.abs(dy))<24)return;if(Math.abs(dx)>Math.abs(dy))makeMove(dx>0?'R':'L');else makeMove(dy>0?'D':'U');};
+  return <div className="game-panel"><div className="game-topline">
+    <div><span>Score</span><strong>{score}</strong></div><div><span>Best</span><strong>{best}</strong></div><div><span>Moves</span><strong>{moves}</strong></div><div><span>Goal</span><strong>2048</strong></div>
+  </div>{over&&<div className="game-over">No moves left. Beat your best score and start another run.</div>}
+  <div className="game-2048 mobile-swipe" onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>{board.map((v,i)=><motion.div layout key={i} className={'tile-2048 v-'+v}>{v||''}</motion.div>)}</div>
+  <div className="game-actions"><button className="lab-button" onClick={undoMove} disabled={!undo}>Undo</button><button className="lab-button" onClick={reset}><RotateCcw size={13}/> New run</button><span className="game-status">Swipe on mobile · WASD / arrows on desktop.</span></div></div>;
 }
-
 const puzzleBase:number[][]=[
 [5,3,0,0,7,0,0,0,0],[6,0,0,1,9,5,0,0,0],[0,9,8,0,0,0,0,6,0],
 [8,0,0,0,6,0,0,0,3],[4,0,0,8,0,3,0,0,1],[7,0,0,0,2,0,0,0,6],
@@ -151,58 +177,35 @@ const puzzleBase:number[][]=[
 function solveSudoku(board:number[][]){for(let r=0;r<9;r++)for(let c=0;c<9;c++)if(board[r][c]===0){for(let n=1;n<=9;n++){if(valid(board,r,c,n)){board[r][c]=n;if(solveSudoku(board))return true;board[r][c]=0} }return false}return true}
 function valid(b:number[][],r:number,c:number,n:number){for(let i=0;i<9;i++)if(b[r][i]===n||b[i][c]===n)return false;const br=Math.floor(r/3)*3,bc=Math.floor(c/3)*3;for(let y=0;y<3;y++)for(let x=0;x<3;x++)if(b[br+y][bc+x]===n)return false;return true}
 function Sudoku(){
-  const [board,setBoard]=useState(()=>puzzleBase.map(r=>[...r])),[solved,setSolved]=useState(false);
-  const reset=()=>{setBoard(puzzleBase.map(r=>[...r]));setSolved(false)};
-  const solve=()=>{const copy=board.map(r=>[...r]);solveSudoku(copy);setBoard(copy);setSolved(true)};
-  return <div className="game-panel">
-    <div className="game-topline"><div><span>Mode</span><strong>Classic 9×9</strong></div><div><span>Solver</span><strong>Backtracking</strong></div><div><span>State</span><strong>{solved?'Solved':'Playable'}</strong></div></div>
-    <div className="sudoku-grid">{board.flatMap((row,r)=>row.map((v,c)=><div className={'sudoku-cell '+((r%3===2?'edge-r ':'')+(c%3===2?'edge-c':''))} key={r*9+c}>{v||''}</div>))}</div>
-    <div className="game-actions"><button className="lab-button primary" onClick={solve}>Solve puzzle</button><button className="lab-button" onClick={reset}><RotateCcw size={13}/> Reset</button></div>
-  </div>;
+  const solvedBase=useMemo(()=>{const copy=puzzleBase.map(r=>[...r]);solveSudoku(copy);return copy;},[]);
+  const [board,setBoard]=useState(()=>puzzleBase.map(r=>[...r])),[solved,setSolved]=useState(false),[mistakes,setMistakes]=useState(0),[hints,setHints]=useState(0),[seconds,setSeconds]=useState(0);
+  useEffect(()=>{if(solved)return;const id=window.setInterval(()=>setSeconds(s=>s+1),1000);return()=>window.clearInterval(id);},[solved]);
+  const reset=()=>{setBoard(puzzleBase.map(r=>[...r]));setSolved(false);setMistakes(0);setHints(0);setSeconds(0)};
+  const update=(r:number,c:number,value:string)=>{if(puzzleBase[r][c]!==0||solved)return;const n=Math.max(0,Math.min(9,Number(value)||0));const next=board.map(row=>[...row]);next[r][c]=n;setBoard(next);setSolved(next.every((row,rr)=>row.every((v,cc)=>v!==0&&v===solvedBase[rr][cc])))};
+  const check=()=>{let wrong=0;for(let r=0;r<9;r++)for(let col=0;col<9;col++)if(puzzleBase[r][col]===0&&board[r][col]!==0&&board[r][col]!==solvedBase[r][col])wrong++;setMistakes(w=>w+wrong);if(wrong===0&&board.every(row=>row.every(Boolean)))setSolved(true)};
+  const hint=()=>{for(let r=0;r<9;r++)for(let col=0;col<9;col++)if(puzzleBase[r][col]===0&&board[r][col]===0){const next=board.map(row=>[...row]);next[r][col]=solvedBase[r][col];setBoard(next);setHints(h=>h+1);return;}};
+  const time=String(Math.floor(seconds/60)).padStart(2,'0')+':'+String(seconds%60).padStart(2,'0');
+  return <div className="game-panel"><div className="game-topline"><div><span>Time</span><strong>{time}</strong></div><div><span>Mistakes</span><strong>{mistakes}</strong></div><div><span>Hints</span><strong>{hints}</strong></div><div><span>State</span><strong>{solved?'Solved':'In play'}</strong></div></div>
+    <div className="sudoku-grid">{board.flatMap((row,r)=>row.map((v,col)=>{const fixed=puzzleBase[r][col]!==0,wrong=!fixed&&v!==0&&v!==solvedBase[r][col];return <input key={r*9+col} className={'sudoku-cell sudoku-input '+(r%3===2?'edge-r ':'')+(col%3===2?'edge-c ':'')+(wrong?'wrong':'')} value={v||''} inputMode="numeric" maxLength={1} disabled={fixed||solved} onChange={e=>update(r,col,e.target.value)} aria-label={'Sudoku row '+(r+1)+' column '+(col+1)}/>;}))}</div>
+    <div className="game-actions"><button className="lab-button primary" onClick={check}>Check</button><button className="lab-button" onClick={hint} disabled={solved}><Lightbulb size={13}/> Hint</button><button className="lab-button" onClick={()=>{setBoard(solvedBase.map(r=>[...r]));setSolved(true)}}>Solve</button><button className="lab-button" onClick={reset}><RotateCcw size={13}/> Reset</button></div>
+    <div className="game-status">Fill it yourself, keep mistakes low, then beat your time.</div></div>;
 }
-
-type Node={r:number;c:number};
 function Maze(){
-  const size=15;
-  const [algorithm,setAlgorithm]=useState<'BFS'|'DFS'|'A*'>('A*');
-  const [path,setPath]=useState<Set<string>>(new Set()),[visited,setVisited]=useState<Set<string>>(new Set());
-  const startNode={r:0,c:0},endNode={r:size-1,c:size-1};
-  const key=(n:Node)=>n.r+','+n.c;
-  const wall=(r:number,c:number)=>((r*17+c*31)%11)<3 && !(r===0&&c<3) && !(c===size-1&&r>size-4);
-  const solve=()=>{
-    const score=new Map<string,number>([[key(startNode),0]]);
-    const prev=new Map<string,string>();const seen=new Set<string>();const frontier:{node:Node;priority:number}[]=[{node:startNode,priority:0}];
+  const size=15;const [algorithm,setAlgorithm]=useState<'BFS'|'DFS'|'A*'>('A*');const [seed,setSeed]=useState(1);
+  const [path,setPath]=useState<Set<string>>(new Set()),[visited,setVisited]=useState<Set<string>>(new Set()),[runs,setRuns]=useState(0);
+  const startNode={r:0,c:0},endNode={r:size-1,c:size-1};const key=(n:Node)=>n.r+','+n.c;
+  const wall=(r:number,c:number)=>{const n=(r*17+c*31+seed*13)%11;return n<3&&!(r===0&&c<3)&&!(c===size-1&&r>size-4)};
+  const solve=()=>{const score=new Map<string,number>([[key(startNode),0]]),prev=new Map<string,string>(),seen=new Set<string>(),frontier:{node:Node;priority:number}[]=[{node:startNode,priority:0}];
     const pop=()=>{frontier.sort((a,b)=>a.priority-b.priority);return algorithm==='DFS'?frontier.pop()!:frontier.shift()!};
-    while(frontier.length){
-      const current=pop();const curKey=key(current.node);if(seen.has(curKey))continue;seen.add(curKey);
-      if(curKey===key(endNode))break;
-      for(const [dr,dc] of [[1,0],[-1,0],[0,1],[0,-1]]){
-        const next={r:current.node.r+dr,c:current.node.c+dc};
-        if(next.r<0||next.r>=size||next.c<0||next.c>=size||wall(next.r,next.c))continue;
-        const nk=key(next),g=(score.get(curKey)??0)+1;
-        if(!score.has(nk)||g<(score.get(nk)??Infinity)){
-          score.set(nk,g);prev.set(nk,curKey);
-          const h=Math.abs(next.r-endNode.r)+Math.abs(next.c-endNode.c);
-          const priority=algorithm==='A*'?g+h:(algorithm==='BFS'?g:0);
-          frontier.push({node:next,priority});
-        }
-      }
-    }
-    const p=new Set<string>();let at=key(endNode);
-    if(!prev.has(at)&&at!==key(startNode)){setVisited(seen);setPath(p);return;}
-    while(at){p.add(at);if(at===key(startNode))break;at=prev.get(at)||''}
-    setVisited(seen);setPath(p);
-  };
-  return <div className="game-panel">
-    <div className="game-topline"><div><span>Algorithm</span><strong>{algorithm}</strong></div><div><span>Nodes</span><strong>{visited.size||'—'}</strong></div><div><span>Path</span><strong>{path.size||'—'} steps</strong></div></div>
-    <div className="maze-toolbar">{(['BFS','DFS','A*'] as const).map(a=><button className={'lab-button '+(algorithm===a?'selected':'')} onClick={()=>{setAlgorithm(a);setPath(new Set());setVisited(new Set())}} key={a}>{a}</button>)}</div>
-    <div className="maze-grid">{Array.from({length:size*size},(_,i)=>{const r=Math.floor(i/size),c=i%size,k=r+','+c;return <div key={k} className={'maze-cell '+(wall(r,c)?'wall ':'')+(visited.has(k)?'visited ':'')+(path.has(k)?'path ':'')+(r===0&&c===0?'start ':'')+(r===size-1&&c===size-1?'end ':'')}></div>})}</div>
-    <div className="game-actions"><button className="lab-button primary" onClick={solve}>Run {algorithm}</button><span className="game-status">Find a route from S to E.</span></div>
-  </div>;
+    while(frontier.length){const current=pop(),curKey=key(current.node);if(seen.has(curKey))continue;seen.add(curKey);if(curKey===key(endNode))break;
+      for(const [dr,dc] of [[1,0],[-1,0],[0,1],[0,-1]]){const next={r:current.node.r+dr,c:current.node.c+dc};if(next.r<0||next.r>=size||next.c<0||next.c>=size||wall(next.r,next.c))continue;const nk=key(next),g=(score.get(curKey)??0)+1;if(!score.has(nk)||g<(score.get(nk)??Infinity)){score.set(nk,g);prev.set(nk,curKey);const h=Math.abs(next.r-endNode.r)+Math.abs(next.c-endNode.c);frontier.push({node:next,priority:algorithm==='A*'?g+h:(algorithm==='BFS'?g:0)});}}}
+    const p=new Set<string>();let at=key(endNode);if(!prev.has(at)&&at!==key(startNode)){setVisited(seen);setPath(p);return;}while(at){p.add(at);if(at===key(startNode))break;at=prev.get(at)||''}setVisited(seen);setPath(p);setRuns(r=>r+1);};
+  const nextMaze=()=>{setSeed(s=>s+1);setPath(new Set());setVisited(new Set())};
+  return <div className="game-panel"><div className="game-topline"><div><span>Algorithm</span><strong>{algorithm}</strong></div><div><span>Nodes</span><strong>{visited.size||'—'}</strong></div><div><span>Path</span><strong>{path.size||'—'} steps</strong></div><div><span>Runs</span><strong>{runs}</strong></div></div>
+    <div className="maze-toolbar">{(['BFS','DFS','A*'] as const).map(a=><button className={'lab-button '+(algorithm===a?'selected':'')} onClick={()=>{setAlgorithm(a);setPath(new Set());setVisited(new Set())}} key={a}>{a}</button>)}<button className="lab-button" onClick={nextMaze}>New maze ↻</button></div>
+    <div className="maze-grid">{Array.from({length:size*size},(_,i)=>{const r=Math.floor(i/size),col=i%size,k=r+','+col;return <div key={k} className={'maze-cell '+(wall(r,col)?'wall ':'')+(visited.has(k)?'visited ':'')+(path.has(k)?'path ':'')+(r===0&&col===0?'start ':'')+(r===size-1&&col===size-1?'end ':'')}></div>})}</div>
+    <div className="game-actions"><button className="lab-button primary" onClick={solve}>Run {algorithm}</button><span className="game-status">Try each algorithm, then generate another maze.</span></div></div>;
 }
-
-
-
 function Tango() {
   type Cell = 'sun' | 'moon' | null;
   const solution:Cell[][] = [
@@ -288,7 +291,7 @@ function Wend() {
   const [hints,setHints]=useState(0);
   const [elapsed,setElapsed]=useState(0);
   const [started,setStarted]=useState<number|null>(null);
-  const [complete,setComplete]=useState(false);
+  const [complete,setComplete]=useState(false);\n  const [score,setScore]=useState(0);\n  const [streak,setStreak]=useState(()=>Number(localStorage.getItem('brain-wend-streak')||0));\n  const [best,setBest]=useState(()=>Number(localStorage.getItem('brain-wend-best')||0));
   const [usedHint,setUsedHint]=useState<number|null>(null);
   const [dragging,setDragging]=useState(false);
 
@@ -330,14 +333,17 @@ function Wend() {
       setHistory(prev=>[...prev,path]);
       setFound(prev=>{
         const next=[...prev,formed];
-        if(next.length===puzzle.words.length){setComplete(true);setElapsed(performance.now()-(started??performance.now()));}
+        const gained=formed.length*100+Math.max(0,80-hints*10);
+        setScore(s=>s+gained);
+        setStreak(s=>{const n=s+1;localStorage.setItem('brain-wend-streak',String(n));return n});
+        if(next.length===puzzle.words.length){setComplete(true);setElapsed(performance.now()-(started??performance.now()));setBest(b=>{const n=Math.max(b,score+gained);localStorage.setItem('brain-wend-best',String(n));return n});}
         return next;
       });
       setMistake('');
       setPath([]);
       return;
     }
-    setMistake(formed+' is not one of the hidden words.');
+    setStreak(0);localStorage.setItem('brain-wend-streak','0');setMistake(formed+' is not one of the hidden words.');
     setPath([]);
   };
 
@@ -355,7 +361,7 @@ function Wend() {
   };
 
   const reset=()=>{
-    setPath([]);setFound([]);setHistory([]);setMistake('');setHints(0);setUsedHint(null);setComplete(false);setElapsed(0);setStarted(null);setDragging(false);
+    setPath([]);setFound([]);setHistory([]);setMistake('');setHints(0);setUsedHint(null);setComplete(false);setElapsed(0);setStarted(null);setDragging(false);setScore(0);setStreak(0);localStorage.setItem('brain-wend-streak','0');
   };
 
   const hint=()=>{
@@ -379,8 +385,10 @@ function Wend() {
   return <div className="game-panel wend-panel">
     <div className="game-topline">
       <div><span>Time</span><strong>{key(elapsed)}</strong></div>
+      <div><span>Score</span><strong>{score}</strong></div>
+      <div><span>Streak</span><strong>{streak} 🔥</strong></div>
+      <div><span>Best</span><strong>{best}</strong></div>
       <div><span>Found</span><strong>{found.length}/{puzzle.words.length}</strong></div>
-      <div><span>Hints</span><strong>{hints}</strong></div>
       <div><span>Words</span><strong>{puzzle.lengths.join(' · ')}</strong></div>
     </div>
 
@@ -429,12 +437,12 @@ function Wend() {
       <button className="lab-button" onClick={reset}><RotateCcw size={13}/> Reset</button>
       <button className="lab-button" onClick={newPuzzle}>New puzzle</button>
     </div>
-    <div className="cross-note">Original Wend-style word-finding puzzle · client-side only · no backend.</div>
+    <div className="cross-note">Original Wend-style word-finding puzzle · score + streaks saved locally · no backend.</div>
   </div>;
 }
 
 export default function BrainLab(){
-  const [game,setGame]=useState<Game>('tic');
+  const [game,setGame]=useState<Game>('wend');
   const tabs=useMemo(()=>[
     {id:'tic' as const,label:'Tic-Tac-Toe',note:'Minimax AI',icon:Trophy},
     {id:'2048' as const,label:'2048',note:'Grid logic',icon:Grid2X2},
