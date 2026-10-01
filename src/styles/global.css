@@ -138,3 +138,20 @@ h1{margin:0;font-size:clamp(48px,6.2vw,82px);line-height:.97;letter-spacing:-.05
 @media (hover:hover) and (pointer:fine){.wend-cell:hover:not(.current):not(.found){box-shadow:0 8px 20px rgba(0,0,0,.14)}}
 @media (max-width:850px){.wend-layout{grid-template-columns:1fr}.wend-board-wrap{max-width:520px}.wend-word-list{max-width:520px}}
 @media (max-width:560px){.wend-panel{padding:15px}.wend-grid{gap:4px}.wend-cell{border-radius:9px;font-size:18px}.wend-lines{inset:5px;width:calc(100% - 10px);height:calc(100% - 10px)}.wend-help{gap:8px;line-height:1.5}}
+
+
+/* Game engagement + mobile polish */
+.mobile-swipe{touch-action:none;user-select:none;-webkit-user-select:none}
+.lab-button:disabled{opacity:.38;cursor:not-allowed;transform:none!important}
+.sudoku-input{width:100%;border:0;border-right:1px solid #252a39;border-bottom:1px solid #252a39;outline:none;text-align:center;caret-color:#9b93ff}
+.sudoku-input:focus{background:#191f36;box-shadow:inset 0 0 0 2px rgba(129,120,255,.4)}
+.sudoku-input.edge-r{border-bottom-color:#50556b}
+.sudoku-input.edge-c{border-right-color:#50556b}
+.sudoku-input.wrong{color:#ffb0c2;background:rgba(255,108,145,.07)}
+.tic-cell{cursor:pointer}
+.game-actions .lab-button.primary:hover{box-shadow:0 8px 24px rgba(255,255,255,.08)}
+@media (max-width:650px){
+  .game-actions{flex-wrap:wrap}
+  .game-status{width:100%;order:5;margin-right:0;line-height:1.5}
+  .wend-target{min-height:46px}
+}
