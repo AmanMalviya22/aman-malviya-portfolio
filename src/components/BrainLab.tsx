@@ -266,24 +266,77 @@ function Tango() {
 }
 
 function Wend() {
-  type Cell = { letter:string; id:number };
-  type Puzzle = { grid:string[]; words:string[]; lengths:number[] };
+  type Puzzle = { size:number; grid:string[]; words:string[]; lengths:number[]; paths:number[][] };
 
   const puzzles: Puzzle[] = [
     {
-      grid: ['C','L','O','U','D','C','A','C','H','E','J','A','Z','Z','Y','S','T','A','C','K','L','O','G','I','C'],
-      words: ['CLOUD','CACHE','JAZZY','STACK','LOGIC'],
-      lengths: [5,5,5,5,5]
+      size: 7,
+      grid: [
+        'C','E','S','T','H','R','E',
+        'A','E','A','Y','Q','D','A',
+        'C','H','B','C','U','E','U',
+        'A','T','A','N','H','I','E',
+        'D','L','L','E','C','T','E',
+        'N','E','A','T','R','A','C',
+        'R','E','K','E','R','U','T'
+      ],
+      words: ['ARCHITECTURE','DATABASE','LATENCY','THREAD','KERNEL','CACHE','QUEUE'],
+      lengths: [12,8,7,6,6,5,5],
+      paths: [
+        [36,35,42,43,44,37,38,39,32,31,24,23],
+        [0,7,14,15,8,9,10,11],
+        [33,32,31,24,25,26,27],
+        [17,24,23,22,29,30],
+        [6,5,4,3,2,1],
+        [27,34,41,40,33],
+        [28,21,14,7,0]
+      ]
     },
     {
-      grid: ['B','R','A','I','N','C','O','D','E','S','F','L','O','W','S','G','R','I','D','S','P','A','T','H','S'],
-      words: ['BRAIN','CODES','FLOWS','GRIDS','PATHS'],
-      lengths: [5,5,5,5,5]
+      size: 7,
+      grid: [
+        'C','A','S','E','E','U','Q',
+        'A','B','Y','C','U','E','L',
+        'C','A','K','N','E','T','A',
+        'H','T','E','R','N','E','R',
+        'E','A','D','A','E','L','U',
+        'T','H','R','R','I','T','T',
+        'D','A','E','C','H','E','C'
+      ],
+      words: ['ARCHITECTURE','DATABASE','LATENCY','THREAD','KERNEL','CACHE','QUEUE'],
+      lengths: [12,8,7,6,6,5,5],
+      paths: [
+        [49,48,47,40,41,34,27,28,35,36,43,44],
+        [0,1,8,15,16,9,10,11],
+        [46,39,32,33,26,19,20],
+        [17,24,25,18,11,4],
+        [6,5,12,13,14,7],
+        [29,30,37,38,45],
+        [42,35,34,27,20]
+      ]
     },
     {
-      grid: ['T','R','A','I','L','S','C','A','L','E','M','A','P','L','E','V','A','L','U','E','S','T','A','T','S'],
-      words: ['TRAIL','SCALE','MAPLE','VALUE','STATS'],
-      lengths: [5,5,5,5,5]
+      size: 7,
+      grid: [
+        'Q','D','A','E','R','T','C',
+        'U','E','E','T','H','U','E',
+        'E','U','H','K','E','R','T',
+        'A','L','C','E','A','R','I',
+        'T','C','A','R','N','C','H',
+        'E','Y','E','L','E','D','A',
+        'N','C','S','A','B','A','T'
+      ],
+      words: ['ARCHITECTURE','DATABASE','LATENCY','THREAD','KERNEL','CACHE','QUEUE'],
+      lengths: [12,8,7,6,6,5,5],
+      paths: [
+        [42,35,28,21,22,23,30,37,38,31,24,25],
+        [6,13,20,27,26,33,34,41],
+        [0,1,8,15,16,9,2],
+        [3,4,11,18,19,12],
+        [5,12,13,14,21,28],
+        [7,14,15,22,29],
+        [40,39,32,25,18]
+      ]
     }
   ];
 
@@ -304,7 +357,10 @@ function Wend() {
   const [dragging,setDragging]=useState(false);
   const usedCells=new Set(history.flat());
 
-  useEffect(()=>{setElapsed(0);setStarted(null);setComplete(false);setPath([]);setFound([]);setHistory([]);setMistake('');setHints(0);setUsedHint(null)},[puzzleIndex]);
+  useEffect(()=>{
+    setElapsed(0);setStarted(null);setComplete(false);setPath([]);setFound([]);setHistory([]);
+    setMistake('');setHints(0);setUsedHint(null);setScore(0);setDragging(false);
+  },[puzzleIndex]);
 
   useEffect(()=>{
     if(!started||complete)return;
@@ -313,24 +369,21 @@ function Wend() {
   },[started,complete]);
 
   const key=(ms:number)=>String(Math.floor(ms/60000)).padStart(2,'0')+':'+String(Math.floor(ms/1000)%60).padStart(2,'0');
-  const row=(i:number)=>Math.floor(i/5),col=(i:number)=>i%5;
+  const row=(i:number)=>Math.floor(i/puzzle.size),col=(i:number)=>i%puzzle.size;
   const adjacent=(a:number,b:number)=>Math.abs(row(a)-row(b))+Math.abs(col(a)-col(b))===1;
   const word=(ids:number[])=>ids.map(i=>puzzle.grid[i]).join('');
 
   const begin=(i:number)=>{
     if(complete||found.length===puzzle.words.length||usedCells.has(i))return;
     if(!started)setStarted(performance.now());
-    setMistake('');
-    setDragging(true);
-    setUsedHint(null);
-    setPath([i]);
+    setMistake('');setDragging(true);setUsedHint(null);setPath([i]);
   };
 
   const extend=(i:number)=>{
     if(!dragging||complete||path.length===0)return;
     const last=path[path.length-1];
     if(i===last||path.includes(i)||usedCells.has(i)||!adjacent(last,i))return;
-    setPath([...path,i]);
+    setPath(prev=>[...prev,i]);
   };
 
   const finish=()=>{
@@ -338,22 +391,27 @@ function Wend() {
     setDragging(false);
     if(path.length<2){setPath([]);return;}
     const formed=word(path);
-    if(puzzle.words.includes(formed)&&!found.includes(formed)){
+    const targetIndex=puzzle.words.indexOf(formed);
+    const targetPath=targetIndex>=0?puzzle.paths[targetIndex]:null;
+    const isExactPath=targetPath?.length===path.length && targetPath.every((cell,idx)=>cell===path[idx]);
+    if(targetIndex>=0&&!found.includes(formed)&&isExactPath){
       setHistory(prev=>[...prev,path]);
       setFound(prev=>{
         const next=[...prev,formed];
-        const gained=formed.length*100+Math.max(0,80-hints*10);
+        const gained=formed.length*100+Math.max(0,100-hints*12);
         setScore(s=>s+gained);
-        setStreak(s=>{const n=s+1;localStorage.setItem('brain-wend-streak',String(n));return n});
-        if(next.length===puzzle.words.length){setComplete(true);setElapsed(performance.now()-(started??performance.now()));setBest(b=>{const n=Math.max(b,score+gained);localStorage.setItem('brain-wend-best',String(n));return n});}
+        setStreak(s=>{const n=s+1;window.localStorage.setItem('brain-wend-streak',String(n));return n});
+        if(next.length===puzzle.words.length){
+          setComplete(true);
+          setElapsed(performance.now()-(started??performance.now()));
+          setBest(b=>{const n=Math.max(b,score+gained);window.localStorage.setItem('brain-wend-best',String(n));return n});
+        }
         return next;
       });
-      setMistake('');
-      setPath([]);
-      return;
+      setMistake('');setPath([]);return;
     }
-    setStreak(0);localStorage.setItem('brain-wend-streak','0');setMistake(formed+' is not one of the hidden words.');
-    setPath([]);
+    setStreak(0);window.localStorage.setItem('brain-wend-streak','0');
+    setMistake(formed+' is not the hidden path.');setPath([]);
   };
 
   useEffect(()=>{
@@ -361,53 +419,48 @@ function Wend() {
     window.addEventListener('pointerup',onPointerUp);
     return()=>window.removeEventListener('pointerup',onPointerUp);
   },[dragging,path,found,hints,started,score]);
-  
+
   const undo=()=>{
-    setPath([]);
-    setMistake('');
-    setDragging(false);
+    setPath([]);setMistake('');setDragging(false);
     if(history.length===0)return;
     const nextHistory=history.slice(0,-1);
     const removedPath=history[history.length-1];
     const removedWord=word(removedPath);
-    setHistory(nextHistory);
-    setFound(prev=>prev.filter(w=>w!==removedWord));
-    setComplete(false);
+    setHistory(nextHistory);setFound(prev=>prev.filter(w=>w!==removedWord));setComplete(false);
   };
 
   const reset=()=>{
-    setPath([]);setFound([]);setHistory([]);setMistake('');setHints(0);setUsedHint(null);setComplete(false);setElapsed(0);setStarted(null);setDragging(false);setScore(0);setStreak(0);localStorage.setItem('brain-wend-streak','0');
+    setPath([]);setFound([]);setHistory([]);setMistake('');setHints(0);setUsedHint(null);
+    setComplete(false);setElapsed(0);setStarted(null);setDragging(false);setScore(0);setStreak(0);
+    window.localStorage.setItem('brain-wend-streak','0');
   };
 
   const hint=()=>{
     if(complete||puzzle.words.length===found.length)return;
     if(!started)setStarted(performance.now());
-    const targetIndex = puzzle.words.findIndex(w=>!found.includes(w));
-    const target=puzzle.words[targetIndex];
-    if(!target)return;
-    const nextIndex=Math.min(hints,target.length-1);
-    setHints(hints+1);
-    const rowStart=targetIndex*5;
-    setUsedHint(rowStart+nextIndex);
-    setMistake('Hint: the next correct word begins with '+target[0]+'.');
+    const targetIndex=puzzle.words.findIndex(w=>!found.includes(w));
+    const target=puzzle.words[targetIndex];const targetPath=puzzle.paths[targetIndex];
+    if(!target||!targetPath)return;
+    const nextIndex=Math.min(hints,targetPath.length-1);
+    setHints(hints+1);setUsedHint(targetPath[nextIndex]);
+    setMistake('Hint: start with '+target[0]+' and watch the highlighted tile.');
   };
 
   const newPuzzle=()=>setPuzzleIndex(i=>(i+1)%puzzles.length);
   const formed=word(path);
-
-  const points=(ids:number[])=>ids.map(i=>((col(i)+.5)/5*500)+','+((row(i)+.5)/5*500)).join(' ');
+  const points=(ids:number[])=>ids.map(i=>((col(i)+.5)/puzzle.size*500)+','+((row(i)+.5)/puzzle.size*500)).join(' ');
 
   return <div className="game-panel wend-panel">
     <div className="game-topline">
+      <div><span>Difficulty</span><strong>Hard</strong></div>
       <div><span>Time</span><strong>{key(elapsed)}</strong></div>
       <div><span>Score</span><strong>{score}</strong></div>
       <div><span>Streak</span><strong>{streak} 🔥</strong></div>
       <div><span>Best</span><strong>{best}</strong></div>
       <div><span>Found</span><strong>{found.length}/{puzzle.words.length}</strong></div>
-      <div><span>Words</span><strong>{puzzle.lengths.join(' · ')}</strong></div>
     </div>
 
-    <div className="wend-help"><span>Drag through adjacent letters to make a word.</span><span>Every tile is used exactly once.</span></div>
+    <div className="wend-help"><span>7 × 7 board · no diagonals</span><span>Words may bend and cross your instincts</span><span>Every tile is used exactly once</span></div>
 
     <div className="wend-layout">
       <div className="wend-board-wrap">
@@ -428,7 +481,7 @@ function Wend() {
           }}
         >
           {puzzle.grid.map((letter,i)=>{
-            const isPath=path.includes(i),isFound=history.some(ids=>ids.includes(i));
+            const isPath=path.includes(i),isFound=usedCells.has(i);
             return <button
               key={i}
               type="button"
@@ -444,15 +497,12 @@ function Wend() {
       <aside className="wend-word-list" aria-live="polite">
         <div className="wend-list-title">Find these lengths</div>
         {puzzle.lengths.map((len,i)=>{
-          const hit=puzzle.words[i] && found.includes(puzzle.words[i]) ? puzzle.words[i] : undefined;
-          return <div className={'wend-target '+(hit?'done':'')} key={i}>
-            <span>{hit||Array.from({length:len},()=>'_').join(' ')}</span>
-            {hit&&<Check size={14}/>}
-          </div>;
+          const hit=puzzle.words[i]&&found.includes(puzzle.words[i])?puzzle.words[i]:undefined;
+          return <div className={'wend-target '+(hit?'done':'')} key={i}><span>{hit||Array.from({length:len},()=>'_').join(' ')}</span>{hit&&<Check size={14}/>}</div>;
         })}
         {formed&&<div className="wend-live">Current: <b>{formed}</b></div>}
         {mistake&&<div className="wend-error">{mistake}</div>}
-        {complete&&<div className="wend-complete">Puzzle complete · {key(elapsed)}</div>}
+        {complete&&<div className="wend-complete">Puzzle complete · {key(elapsed)} · {score} points</div>}
       </aside>
     </div>
 
@@ -462,7 +512,7 @@ function Wend() {
       <button className="lab-button" onClick={reset}><RotateCcw size={13}/> Reset</button>
       <button className="lab-button" onClick={newPuzzle}>New puzzle</button>
     </div>
-    <div className="cross-note">Original Wend-style word-finding puzzle · score + streaks saved locally · no backend.</div>
+    <div className="cross-note">LinkedIn-inspired difficulty · original puzzle data · client-side only · no backend.</div>
   </div>;
 }
 
