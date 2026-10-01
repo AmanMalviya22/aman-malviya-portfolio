@@ -264,7 +264,8 @@ export default function BrainLab(){
     {id:'reaction' as const,label:'Reaction',note:'Human timing',icon:Clock3},
     {id:'2048' as const,label:'2048',note:'Grid logic',icon:Grid2X2},
     {id:'sudoku' as const,label:'Sudoku',note:'Backtracking',icon:Grid2X2},
-    {id:'maze' as const,label:'Maze Solver',note:'BFS · DFS · A*',icon:Zap},\n    {id:'tango' as const,label:'Tango Logic',note:'Equal / different',icon:Sun}
+    {id:'maze' as const,label:'Maze Solver',note:'BFS · DFS · A*',icon:Zap},
+    {id:'tango' as const,label:'Tango Logic',note:'Equal / different',icon:Sun}
   ],[]);
   return <div className="brain-lab">
     <div className="lab-tabs">{tabs.map(({id,label,note,icon:Icon})=><button className={game===id?'active':''} onClick={()=>setGame(id)} key={id}><Icon size={14}/><span>{label}</span><small>{note}</small></button>)}</div>
