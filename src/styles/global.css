@@ -31,3 +31,32 @@ h1{margin:0;font-size:clamp(48px,6.2vw,82px);line-height:.97;letter-spacing:-.05
 
 @media (max-width:950px){.nav-links{display:none}.hero-inner,.split{grid-template-columns:1fr}.project-grid{grid-template-columns:1fr 1fr}.contact-card{flex-direction:column;align-items:flex-start}.brain-head{display:block}.lab-badge{display:inline-block;margin-top:16px}}
 @media (max-width:650px){.container{width:min(100% - 28px,1180px)}.nav-button{padding:9px 11px}.hero{padding-top:125px}.hero-text{font-size:16px}.proof{gap:17px}.section{padding:88px 0}.about-grid,.project-grid{grid-template-columns:1fr}.row-head{display:block}.row-head .text-link{display:inline-block;margin-top:16px}.contact-card{padding:26px}.footer-inner{flex-direction:column}.memory-grid{max-width:100%}}
+
+/* Brain Lab interaction layer */
+.lab-caption{display:flex;gap:8px;flex-wrap:wrap;margin:11px 0 0;color:#5f667a;font:9px ui-monospace,monospace;text-transform:uppercase;letter-spacing:.08em}
+.lab-tabs button{transition:transform .2s ease,border-color .2s ease,background .2s ease;position:relative;overflow:hidden}
+.lab-tabs button:hover{transform:translateY(-2px)}
+.lab-tabs button.active:after{content:"";position:absolute;left:12px;right:12px;bottom:5px;height:1px;background:linear-gradient(90deg,transparent,#8179ff,transparent);opacity:.7}
+.game-panel{box-shadow:0 20px 70px rgba(0,0,0,.12)}
+.game-topline{display:flex;gap:28px;align-items:end;flex-wrap:wrap;margin-bottom:20px}
+.game-topline div{display:flex;flex-direction:column;gap:3px}
+.game-topline span{font-size:8px;text-transform:uppercase;letter-spacing:.12em;color:#5f6679}
+.game-topline strong{font-size:14px;color:#dfe2ed}
+.game-topline .status-copy{margin-right:auto}
+.game-topline .status-copy strong{font-size:12px;color:#aeb4c6;font-weight:600}
+.game-over{margin:0 0 12px;padding:10px 12px;border:1px solid rgba(255,116,153,.18);border-radius:10px;background:rgba(255,116,153,.06);color:#e1a4b7;font-size:10px}
+.lab-button{transition:transform .18s ease,border-color .18s ease,background .18s ease}
+.lab-button:hover{transform:translateY(-1px);border-color:rgba(255,255,255,.15);background:rgba(255,255,255,.06)}
+.lab-button.selected{border-color:rgba(122,115,255,.34);background:rgba(122,115,255,.08);color:#d8d4ff}
+.game-2048{width:min(420px,100%);display:grid;grid-template-columns:repeat(4,1fr);gap:7px;padding:7px;border-radius:15px;background:#090c18;border:1px solid var(--line)}
+.tile-2048{aspect-ratio:1;display:grid;place-items:center;border-radius:10px;background:#12172a;color:#70778d;font-weight:750;font-size:clamp(15px,3vw,24px);transition:filter .18s ease,transform .18s ease}
+.tile-2048:not(.v-0){color:#eff1f8;background:linear-gradient(145deg,#222943,#151a2d);box-shadow:inset 0 0 0 1px rgba(255,255,255,.06)}
+.tile-2048.v-2{color:#cfd4ff}.tile-2048.v-4{color:#b8e5ff}.tile-2048.v-8{color:#c8f4db}.tile-2048.v-16{color:#e5d1ff}.tile-2048.v-32{color:#ffcfdf}.tile-2048.v-64{color:#ffd5a7}.tile-2048.v-128,.tile-2048.v-256,.tile-2048.v-512,.tile-2048.v-1024,.tile-2048.v-2048{background:linear-gradient(145deg,#6158d8,#322f72);color:#fff}
+.sudoku-grid{width:min(450px,100%);display:grid;grid-template-columns:repeat(9,1fr);border:1px solid #35394a;border-radius:14px;overflow:hidden;background:#0a0d19}
+.sudoku-cell{aspect-ratio:1;display:grid;place-items:center;border-right:1px solid #252a39;border-bottom:1px solid #252a39;background:#101528;color:#e4e7f0;font-size:15px;font-weight:650}
+.sudoku-cell:nth-child(9n){border-right:0}.sudoku-cell:nth-last-child(-n+9){border-bottom:0}
+.sudoku-cell.edge-r{border-bottom-color:#50556b}.sudoku-cell.edge-c{border-right-color:#50556b}
+.maze-toolbar{display:flex;gap:7px;margin-bottom:10px}.maze-grid{width:min(510px,100%);display:grid;grid-template-columns:repeat(15,1fr);gap:2px;padding:7px;background:#090c18;border:1px solid var(--line);border-radius:14px}
+.maze-cell{aspect-ratio:1;border-radius:2px;background:#10152a}.maze-cell.wall{background:#2b3045}.maze-cell.visited{background:#28305a}.maze-cell.path{background:#7c74ff;box-shadow:0 0 8px rgba(124,116,255,.35)}.maze-cell.start{background:#55d69c}.maze-cell.end{background:#ffb86b}
+.memory-tile{will-change:transform}.tic-cell{transition:background .15s ease}
+@media (max-width:650px){.game-topline{gap:18px}.game-topline .status-copy{width:100%;order:3}.sudoku-cell{font-size:12px}.maze-grid{gap:1px;padding:5px}}
