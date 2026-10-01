@@ -6,6 +6,11 @@ type Game = 'tic' | '2048' | 'sudoku' | 'maze' | 'wend';
 
 const emptyBoard = Array.from({ length: 9 }, () => null as 'X' | 'O' | null);
 
+function storedNumber(key:string, fallback=0){
+  if(typeof window==='undefined') return fallback;
+  return Number(window.localStorage.getItem(key) || fallback);
+}
+
 function winner(board: (string | null)[]) {
   const lines = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
   for (const [a,b,c] of lines) if (board[a] && board[a] === board[b] && board[a] === board[c]) return board[a];
@@ -54,10 +59,10 @@ function Tic() {
   const [board,setBoard]=useState<(string|null)[]>([...emptyBoard]);
   const [thinking,setThinking]=useState(false);
   const [stats,setStats]=useState(()=>({
-    wins:Number(localStorage.getItem('brain-tic-wins')||0),
-    losses:Number(localStorage.getItem('brain-tic-losses')||0),
-    draws:Number(localStorage.getItem('brain-tic-draws')||0),
-    streak:Number(localStorage.getItem('brain-tic-streak')||0)
+    wins:storedNumber('brain-tic-wins'),
+    losses:storedNumber('brain-tic-losses'),
+    draws:storedNumber('brain-tic-draws'),
+    streak:storedNumber('brain-tic-streak')
   }));
   const [last,setLast]=useState('');
   const w=winner(board);
@@ -144,7 +149,7 @@ function canMove2048(board:Board2048){
 }
 function Game2048(){
   const [board,setBoard]=useState<Board2048>(()=>empty2048());
-  const [score,setScore]=useState(0),[best,setBest]=useState(()=>Number(localStorage.getItem('brain-2048-best')||0));
+  const [score,setScore]=useState(0),[best,setBest]=useState(()=>storedNumber('brain-2048-best'));
   const [over,setOver]=useState(false),[moves,setMoves]=useState(0);
   const [undo,setUndo]=useState<{board:Board2048;score:number;over:boolean}|null>(null);
   const touchStart=useRef<{x:number;y:number}|null>(null);
@@ -293,8 +298,8 @@ function Wend() {
   const [started,setStarted]=useState<number|null>(null);
   const [complete,setComplete]=useState(false);
   const [score,setScore]=useState(0);
-  const [streak,setStreak]=useState(()=>Number(localStorage.getItem('brain-wend-streak')||0));
-  const [best,setBest]=useState(()=>Number(localStorage.getItem('brain-wend-best')||0));
+  const [streak,setStreak]=useState(()=>storedNumber('brain-wend-streak'));
+  const [best,setBest]=useState(()=>storedNumber('brain-wend-best'));
   const [usedHint,setUsedHint]=useState<number|null>(null);
   const [dragging,setDragging]=useState(false);
   const usedCells=new Set(history.flat());
