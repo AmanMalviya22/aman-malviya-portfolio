@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { Brain, Clock3, Grid2X2, RotateCcw, Sun, Trophy, Zap } from 'lucide-react';
 
-type Game = 'memory' | 'tic' | 'reaction' | '2048' | 'sudoku' | 'maze';
+type Game = 'memory' | 'tic' | 'reaction' | '2048' | 'sudoku' | 'maze' | 'tango';
 
 const emptyBoard = Array.from({ length: 9 }, () => null as 'X' | 'O' | null);
 
