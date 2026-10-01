@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
-import { ArrowUpDown, Brain, Check, Clock3, Grid2X2, Lightbulb, RotateCcw, Sun, Trophy, Zap } from 'lucide-react';
+import { ArrowUpDown, Check, Grid2X2, Lightbulb, RotateCcw, Trophy, Zap } from 'lucide-react';
 
 type Game = 'tic' | '2048' | 'sudoku' | 'maze' | 'wend';
 
@@ -291,9 +291,13 @@ function Wend() {
   const [hints,setHints]=useState(0);
   const [elapsed,setElapsed]=useState(0);
   const [started,setStarted]=useState<number|null>(null);
-  const [complete,setComplete]=useState(false);\n  const [score,setScore]=useState(0);\n  const [streak,setStreak]=useState(()=>Number(localStorage.getItem('brain-wend-streak')||0));\n  const [best,setBest]=useState(()=>Number(localStorage.getItem('brain-wend-best')||0));
+  const [complete,setComplete]=useState(false);
+  const [score,setScore]=useState(0);
+  const [streak,setStreak]=useState(()=>Number(localStorage.getItem('brain-wend-streak')||0));
+  const [best,setBest]=useState(()=>Number(localStorage.getItem('brain-wend-best')||0));
   const [usedHint,setUsedHint]=useState<number|null>(null);
   const [dragging,setDragging]=useState(false);
+  const usedCells=new Set(history.flat());
 
   useEffect(()=>{setElapsed(0);setStarted(null);setComplete(false);setPath([]);setFound([]);setHistory([]);setMistake('');setHints(0);setUsedHint(null)},[puzzleIndex]);
 
@@ -454,7 +458,7 @@ export default function BrainLab(){
     <div className="lab-tabs">{tabs.map(({id,label,note,icon:Icon})=><button className={game===id?'active':''} onClick={()=>setGame(id)} key={id}><Icon size={14}/><span>{label}</span><small>{note}</small></button>)}</div>
     <div className="lab-caption"><span>client-side experiments</span><span>•</span><span>scores stored locally</span><span>•</span><span>no backend</span></div>
     <AnimatePresence mode="wait">
-      <motion.div key={game} initial={{opacity:0,y:10}} animate={{opacity:1,y:0}} exit={{opacity:0,y:-8}} transition={{duration:.22}}>{game==='memory'&&<Memory/>}{game==='tic'&&<Tic/>}{game==='reaction'&&<Reaction/>}{game==='2048'&&<Game2048/>}{game==='sudoku'&&<Sudoku/>}{game==='maze'&&<Maze/>}{game==='tango'&&<Tango/>}{game==='wend'&&<Wend/>}</motion.div>
+      <motion.div key={game} initial={{opacity:0,y:10}} animate={{opacity:1,y:0}} exit={{opacity:0,y:-8}} transition={{duration:.22}}>{game==='tic'&&<Tic/>}{game==='2048'&&<Game2048/>}{game==='sudoku'&&<Sudoku/>}{game==='maze'&&<Maze/>}{game==='wend'&&<Wend/>}</motion.div>
     </AnimatePresence>
   </div>;
 }
