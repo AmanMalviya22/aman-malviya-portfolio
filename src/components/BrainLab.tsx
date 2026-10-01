@@ -286,6 +286,7 @@ function Crossclimb() {
   const [hints, setHints] = useState(0);
   const [status, setStatus] = useState('Solve each clue, then arrange the ladder.');
   const [solved, setSolved] = useState(false);
+  const [unlocked, setUnlocked] = useState(false);
   const [best, setBest] = useState<number | null>(null);
 
   useEffect(() => {
@@ -333,13 +334,7 @@ function Crossclimb() {
     if (autoReorder) maybeAutoReorder();
   };
 
-  const maybeAutoReorder = () => {
-    setRungs(prev => {
-      const correct = [...middleInitial];
-      correct.sort((a,b) => a.answer.localeCompare(b.answer));
-      return prev.length === correct.length ? correct : prev;
-    });
-  };
+  const maybeAutoReorder = () => setRungs([...middleInitial]);
 
   const handleInput = (id:string,value:string,isTop=false,isBottom=false) => {
     kickOff();
@@ -381,6 +376,7 @@ function Crossclimb() {
       setStatus('Your words are right, but the ladder order is not. Rearrange the middle rungs.');
       return;
     }
+    setUnlocked(true);
     setStatus('Ladder unlocked. Solve the final top and bottom clues.');
   };
 
@@ -435,6 +431,7 @@ function Crossclimb() {
     setMistakes(0);
     setHints(0);
     setSolved(false);
+    setUnlocked(false);
     setStatus('Solve each clue, then arrange the ladder.');
   };
 
@@ -460,7 +457,7 @@ function Crossclimb() {
         value={displayValue}
         placeholder="4 letters"
         maxLength={4}
-        disabled={locked && !solved}
+        disabled={locked && !unlocked && !solved}
         onChange={e=>handleInput(rung.id,e.target.value,rung.id==='top',rung.id==='bottom')}
         onFocus={kickOff}
         className={autoCheck && value && !correct ? 'wrong-input' : ''}
@@ -503,7 +500,7 @@ function Crossclimb() {
 
     <div className="game-actions cross-actions">
       <button className="lab-button primary" onClick={unlock} disabled={solved}>Unlock top & bottom</button>
-      <button className="lab-button primary" onClick={checkFinal} disabled={solved}>Finish ladder</button>
+      <button className="lab-button primary" onClick={checkFinal} disabled={!unlocked || solved}>Finish ladder</button>
       <button className="lab-button" onClick={reset}><RotateCcw size={13}/> New puzzle</button>
     </div>
 
