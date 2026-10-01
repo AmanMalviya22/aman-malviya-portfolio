@@ -273,9 +273,9 @@ function Wend() {
       lengths: [5,5,5,5,5]
     },
     {
-      grid: ['T','R','A','C','E','S','C','A','L','E','S','M','A','P','S','V','A','L','U','E','S','S','T','A','T'],
-      words: ['TRACES','SCALE','MAPS','VALUE','STAT'],
-      lengths: [6,5,4,5,4]
+      grid: ['T','R','A','I','L','S','C','A','L','E','M','A','P','L','E','V','A','L','U','E','S','T','A','T','S'],
+      words: ['TRAIL','SCALE','MAPLE','VALUE','STATS'],
+      lengths: [5,5,5,5,5]
     }
   ];
 
@@ -306,7 +306,7 @@ function Wend() {
   const word=(ids:number[])=>ids.map(i=>puzzle.grid[i]).join('');
 
   const begin=(i:number)=>{
-    if(complete||found.length===puzzle.words.length)return;
+    if(complete||found.length===puzzle.words.length||usedCells.has(i))return;
     if(!started)setStarted(performance.now());
     setMistake('');
     setDragging(true);
@@ -317,7 +317,7 @@ function Wend() {
   const extend=(i:number)=>{
     if(!dragging||complete||path.length===0)return;
     const last=path[path.length-1];
-    if(i===last||path.includes(i)||!adjacent(last,i))return;
+    if(i===last||path.includes(i)||usedCells.has(i)||!adjacent(last,i))return;
     setPath([...path,i]);
   };
 
@@ -361,12 +361,14 @@ function Wend() {
   const hint=()=>{
     if(complete||puzzle.words.length===found.length)return;
     if(!started)setStarted(performance.now());
-    const target=puzzle.words.find(w=>!found.includes(w));
+    const targetIndex = puzzle.words.findIndex(w=>!found.includes(w));
+    const target=puzzle.words[targetIndex];
     if(!target)return;
     const nextIndex=Math.min(hints,target.length-1);
     setHints(hints+1);
-    setUsedHint(puzzle.grid.findIndex((l,i)=>l===target[nextIndex]&&!found.some(w=>w.includes(l)) && i>=0));
-    setMistake('Hint: look for a word starting with '+target[0]+'.');
+    const rowStart=targetIndex*5;
+    setUsedHint(rowStart+nextIndex);
+    setMistake('Hint: the next correct word begins with '+target[0]+'.');
   };
 
   const newPuzzle=()=>setPuzzleIndex(i=>(i+1)%puzzles.length);
@@ -409,7 +411,7 @@ function Wend() {
       <aside className="wend-word-list" aria-live="polite">
         <div className="wend-list-title">Find these lengths</div>
         {puzzle.lengths.map((len,i)=>{
-          const hit=found[i];
+          const hit=puzzle.words[i] && found.includes(puzzle.words[i]) ? puzzle.words[i] : undefined;
           return <div className={'wend-target '+(hit?'done':'')} key={i}>
             <span>{hit||Array.from({length:len},()=>'_').join(' ')}</span>
             {hit&&<Check size={14}/>}
