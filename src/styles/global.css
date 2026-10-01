@@ -80,3 +80,36 @@ h1{margin:0;font-size:clamp(48px,6.2vw,82px);line-height:.97;letter-spacing:-.05
 .tango-link.diff{color:#9aa1b6}.tango-link.same{color:#a9efd9}
 .tango-cell .tango-link{right:-7px;top:50%;transform:translateY(-50%)}.game-instructions{max-width:720px;margin:0 0 18px;color:#7e8599;font-size:11px;line-height:1.7}.game-instructions b{color:#cfd3df}
 @media (max-width:650px){.tango-cell{font-size:15px}.tango-grid{gap:3px;padding:5px}}
+
+.crossclimb-panel{max-width:980px}
+.cross-intro{display:flex;justify-content:space-between;align-items:center;gap:25px;flex-wrap:wrap;margin-bottom:22px}
+.cross-toggles{display:flex;gap:8px;flex-wrap:wrap}
+.cross-toggles label{display:inline-flex;align-items:center;gap:7px;padding:8px 10px;border:1px solid var(--line);border-radius:9px;background:rgba(255,255,255,.02);color:#7f8699;font-size:9px}
+.cross-toggles input{accent-color:#7770ff}
+.cross-ladder{display:grid;gap:6px}
+.cross-middle{display:grid;gap:6px}
+.cross-drag-wrap{display:grid;grid-template-columns:30px 1fr;gap:6px;align-items:stretch}
+.cross-drag-wrap[draggable=true]{cursor:grab}.cross-drag-wrap[draggable=true]:active{cursor:grabbing}
+.cross-drag-handle{border:1px solid var(--line);border-radius:10px;background:rgba(255,255,255,.02);color:#656c80;display:grid;place-items:center;min-width:30px}
+.cross-drag-handle.active,.cross-drag-handle:hover{color:#bdb9ff;border-color:rgba(120,113,255,.3);background:rgba(120,113,255,.07)}
+.cross-row{display:grid;grid-template-columns:52px minmax(260px,1fr) 120px 28px;gap:14px;align-items:center;min-height:76px;padding:10px 13px;border:1px solid var(--line);border-radius:12px;background:rgba(255,255,255,.018)}
+.cross-row.locked{background:rgba(119,112,255,.04);border-color:rgba(119,112,255,.15)}
+.cross-row.correct{border-color:rgba(95,215,160,.16)}
+.cross-rung-no{color:#5e6579;font:700 8px ui-monospace,monospace;letter-spacing:.08em}
+.cross-clue{min-width:0}.cross-clue-text{color:#b0b6c7;font-size:12px;line-height:1.45}.cross-tools{display:flex;gap:6px;margin-top:7px}
+.cross-mini{border:0;padding:0;background:none;color:#686f83;font-size:9px;display:inline-flex;align-items:center;gap:4px}.cross-mini:hover{color:#bbb7dc}
+.cross-row input{width:100%;height:40px;border:1px solid rgba(255,255,255,.09);border-radius:9px;background:#0a0e1d;color:#eff1f8;text-align:center;letter-spacing:.22em;font:700 15px ui-monospace,monospace;outline:none;text-transform:uppercase}
+.cross-row input:focus{border-color:rgba(129,120,255,.5);box-shadow:0 0 0 3px rgba(129,120,255,.08)}
+.cross-row input:disabled{opacity:.8;color:#c5c9d8}
+.cross-row input.wrong-input{border-color:rgba(255,108,145,.3);color:#ffb0c2}
+.cross-check{color:#75dda7;display:grid;place-items:center}
+.cross-status{margin-top:12px;min-height:18px;color:#838a9e;font-size:10px}
+.cross-actions{flex-wrap:wrap}.cross-note{margin-top:14px;color:#535a6e;font:9px ui-monospace,monospace}
+@media (max-width:760px){
+  .cross-row{grid-template-columns:38px 1fr 100px 22px;gap:9px;min-height:70px;padding:8px}
+  .cross-clue-text{font-size:10px}.cross-row input{font-size:13px;height:36px}
+  .cross-drag-wrap{grid-template-columns:24px 1fr}.cross-drag-handle{min-width:24px}
+}
+@media (max-width:560px){
+  .cross-row{grid-template-columns:30px 1fr;gap:7px}.cross-rung-no{grid-row:1 / span 2}.cross-row input{grid-column:2}.cross-check{position:absolute;margin-left:-28px;margin-top:10px}.cross-clue{grid-column:2}.cross-row.locked input{grid-column:2}.cross-mini{font-size:8px}
+}
