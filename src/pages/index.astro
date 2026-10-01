@@ -1,11 +1,114 @@
 ---
-import Welcome from '../components/Welcome.astro';
 import Layout from '../layouts/Layout.astro';
+import BrainLab from '../components/BrainLab.tsx';
 
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+const experience = [
+  { period: 'Aug 2025 — Sep 2026', company: 'NIUM', role: 'Software Development Engineer I', place: 'Mumbai', bullets: [
+    'Built Java/Spring Boot payment services handling 5K+ daily transactions across 50+ banking partners.',
+    'Improved payment success rates by ~15% and reduced manual intervention by ~40% through automated validation.',
+    'Built an MCP + Claude workflow for transaction-failure root-cause analysis and operational diagnostics.',
+    'Used Redis caching, AWS EKS, CI/CD, monitoring, and automated scaling for production microservices.'
+  ]},
+  { period: 'Apr 2025 — Aug 2025', company: 'Blacklight Studio', role: 'Associate Backend Developer', place: 'Remote', bullets: [
+    'Built and debugged backend features using Java, REST APIs, SQL, and object-oriented design.',
+    'Worked across development and delivery workflows to ship maintainable application changes.'
+  ]},
+  { period: 'Oct 2024 — Feb 2025', company: 'Inorg / VivaOps', role: 'Associate DevOps Engineer', place: 'Remote', bullets: [
+    'Worked with CI/CD, containers, cloud deployment concepts, and operational troubleshooting.',
+    'Improved engineering workflows through automation and deployment support.'
+  ]}
+];
+
+const skills = ['Java','Spring Boot','Microservices','REST APIs','Distributed Systems','AWS','EKS','Redis','SQL','MySQL','PostgreSQL','MongoDB','SQS','RabbitMQ','Docker','Kubernetes','Jenkins','Terraform','Git','System Design','Multithreading','Concurrency','MCP','Claude'];
+
+const projects = [
+  { title: 'Payment RCA Copilot', type: 'AI + Backend', text: 'An MCP-powered diagnostic workflow that connects transaction context with operational logs and guides engineers toward faster root-cause analysis.', tags: ['Java','MCP','Claude','SQL'] },
+  { title: 'Reference Data Graph', type: 'Platform + Data', text: 'Centralized SWIFT, IFSC, and banking-reference data with fast lookup paths and Redis caching for high-traffic services.', tags: ['Java','Redis','AWS','Caching'] },
+  { title: 'Algorithm Playground', type: 'Interactive', text: 'A browser-native collection of algorithm visualizations and brain games designed to make DSA concepts tangible.', tags: ['Astro','React','TypeScript','DSA'] }
+];
 ---
 
 <Layout>
-	<Welcome />
+  <header class="site-nav">
+    <div class="container nav-inner">
+      <a class="brand" href="#top"><span class="brand-mark">AM</span><span>Aman Malviya</span></a>
+      <nav class="nav-links" aria-label="Primary navigation">
+        <a href="#about">About</a><a href="#experience">Experience</a><a href="#skills">Skills</a><a href="#projects">Projects</a><a href="#brain-lab">Brain Lab</a><a href="#contact">Contact</a>
+      </nav>
+      <a class="nav-button" href="https://www.linkedin.com/in/aman-malviya22/" target="_blank" rel="noreferrer">Connect ↗</a>
+    </div>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <div class="hero-grid"></div><div class="hero-glow glow-a"></div><div class="hero-glow glow-b"></div>
+      <div class="container hero-inner">
+        <div class="hero-copy">
+          <div class="eyebrow"><span class="status"></span> Open to backend engineering opportunities</div>
+          <p class="kicker">Backend Engineer · Java · Distributed Systems</p>
+          <h1>I build backend systems that are <span>fast, resilient, and observable.</span></h1>
+          <p class="hero-text">Software engineer with ~2 years of experience across payment platforms, cloud-native services, caching, messaging, and AI-assisted operational tooling.</p>
+          <div class="actions"><a class="btn primary" href="#projects">View selected work ↓</a><a class="btn secondary" href="https://www.linkedin.com/in/aman-malviya22/" target="_blank" rel="noreferrer">LinkedIn ↗</a></div>
+          <div class="proof"><div><b>5K+</b><small>daily transactions</small></div><div><b>50+</b><small>banking partners</small></div><div><b>99.9%+</b><small>uptime target</small></div></div>
+        </div>
+        <div class="terminal">
+          <div class="terminal-head"><span class="lights"><i></i><i></i><i></i></span><span>aman@portfolio ~ /backend</span></div>
+          <div class="terminal-body">
+            <p><em>$</em> whoami</p><h3>Aman Malviya</h3>
+            <p><em>$</em> stack --core</p>
+            <div class="chip-row"><span>Java</span><span>Spring Boot</span><span>AWS</span><span>Redis</span><span>Docker</span><span>K8s</span></div>
+            <p><em>$</em> mission</p><blockquote>Build systems people can trust when traffic, latency, and failures arrive together.</blockquote>
+            <p class="cursor"><em>→</em> _</p>
+          </div>
+        </div>
+      </div>
+      <div class="container scroll-hint"><span>Scroll to explore</span><i></i></div>
+    </section>
+
+    <section id="about" class="section">
+      <div class="container split">
+        <div><p class="label">01 / About</p><h2>Engineering with a systems mindset.</h2></div>
+        <div><p class="lead">I like turning messy backend problems into clear, testable systems — from payment flows and data lookups to observability and AI-assisted debugging.</p>
+          <div class="about-grid">
+            <article><b>01</b><h3>Backend first</h3><p>Java, Spring Boot, REST, data access, concurrency, messaging, and production debugging.</p></article>
+            <article><b>02</b><h3>Reliability minded</h3><p>Timeouts, caching, failure handling, monitoring, and deployment are part of the feature.</p></article>
+            <article><b>03</b><h3>AI curious</h3><p>MCP and Claude experiments aimed at making operational workflows faster and more explainable.</p></article>
+            <article><b>04</b><h3>DSA in practice</h3><p>Algorithms should be understandable. That is why the Brain Lab exists.</p></article>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="experience" class="section alt">
+      <div class="container"><div class="wide-heading"><p class="label">02 / Experience</p><h2>Production systems, not tutorial projects.</h2><p>Backend engineering, fintech workflows, deployment, and operational tooling.</p></div>
+        <div class="timeline">
+          {experience.map((job) => <article class="timeline-item"><div class="rail"><span></span></div><div><div class="meta"><span>{job.period}</span><span>{job.place}</span></div><h3>{job.role}</h3><p class="company">{job.company}</p><ul>{job.bullets.map((bullet) => <li>{bullet}</li>)}</ul></div></article>)}
+        </div>
+      </div>
+    </section>
+
+    <section id="skills" class="section">
+      <div class="container"><div class="wide-heading"><p class="label">03 / Stack</p><h2>Tools I reach for when the system matters.</h2></div>
+        <div class="skills-wrap">
+          {skills.map((skill) => <span class="skill">{skill}</span>)}
+        </div>
+      </div>
+    </section>
+
+    <section id="projects" class="section alt">
+      <div class="container"><div class="wide-heading row-head"><div><p class="label">04 / Projects</p><h2>Selected work & experiments.</h2></div><a class="text-link" href="https://github.com/AmanMalviya22" target="_blank" rel="noreferrer">Browse GitHub ↗</a></div>
+        <div class="project-grid">{projects.map((project, index) => <article class="project"><span class="project-no">0{index + 1}</span><small>{project.type}</small><h3>{project.title}</h3><p>{project.text}</p><div class="tags">{project.tags.map((tag) => <span>{tag}</span>)}</div><a href="#contact">Talk about it ↗</a></article>)}</div>
+      </div>
+    </section>
+
+    <section id="brain-lab" class="section brain">
+      <div class="container"><div class="wide-heading brain-head"><div><p class="label">05 / Brain Lab</p><h2>Play with the engineering.</h2><p>Interactive experiments that turn algorithms and problem-solving into something you can touch.</p></div><span class="lab-badge">React island · client-side only</span></div><BrainLab client:load /></div>
+    </section>
+
+    <section id="contact" class="section contact">
+      <div class="container contact-card"><div><p class="label">06 / Contact</p><h2>Let's build something useful.</h2><p>For backend engineering roles, technical conversations, or interesting engineering problems.</p></div><div class="actions"><a class="btn primary" href="https://www.linkedin.com/in/aman-malviya22/" target="_blank" rel="noreferrer">Connect on LinkedIn ↗</a><a class="btn secondary" href="https://github.com/AmanMalviya22" target="_blank" rel="noreferrer">Open GitHub ↗</a></div></div>
+    </section>
+  </main>
+
+  <footer class="footer"><div class="container footer-inner"><span>© 2026 Aman Malviya</span><span>Astro + React + TypeScript</span><a href="#top">Back to top ↑</a></div></footer>
 </Layout>
