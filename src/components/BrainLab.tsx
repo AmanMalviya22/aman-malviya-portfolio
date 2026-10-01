@@ -356,6 +356,12 @@ function Wend() {
     setPath([]);
   };
 
+  useEffect(()=>{
+    const onPointerUp=()=>{if(dragging)finish();};
+    window.addEventListener('pointerup',onPointerUp);
+    return()=>window.removeEventListener('pointerup',onPointerUp);
+  },[dragging,path,found,hints,started,score]);
+  
   const undo=()=>{
     setPath([]);
     setMistake('');
@@ -409,16 +415,26 @@ function Wend() {
           {history.map((ids,idx)=><polyline key={'f'+idx} points={points(ids)} />)}
           {path.length>1&&<polyline className="active-path" points={points(path)} />}
         </svg>
-        <div className="wend-grid" onPointerUp={finish} onPointerCancel={finish}>
+        <div
+          className="wend-grid"
+          onPointerUp={finish}
+          onPointerCancel={finish}
+          onPointerMove={e=>{
+            if(!dragging)return;
+            const hit=document.elementFromPoint(e.clientX,e.clientY);
+            const cell=hit?.closest?.('[data-wend-index]') as HTMLElement | null;
+            const index=cell ? Number(cell.dataset.wendIndex) : NaN;
+            if(Number.isFinite(index))extend(index);
+          }}
+        >
           {puzzle.grid.map((letter,i)=>{
             const isPath=path.includes(i),isFound=history.some(ids=>ids.includes(i));
             return <button
               key={i}
               type="button"
+              data-wend-index={i}
               className={'wend-cell '+(isPath?'current ':'')+(isFound?'found ':'')+(usedHint===i?'hinted ':'')}
-              onPointerDown={e=>{e.currentTarget.setPointerCapture?.(e.pointerId);begin(i)}}
-              onPointerEnter={()=>extend(i)}
-              onPointerMove={()=>extend(i)}
+              onPointerDown={e=>{e.preventDefault();begin(i)}}
               aria-label={'Letter '+letter+', position '+(i+1)}
             >{letter}</button>
           })}
