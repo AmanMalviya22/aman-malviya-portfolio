@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
-import { Brain, Clock3, Grid2X2, RotateCcw, Trophy, Zap } from 'lucide-react';
+import { Brain, Clock3, Grid2X2, RotateCcw, Sun, Trophy, Zap } from 'lucide-react';
 
 type Game = 'memory' | 'tic' | 'reaction' | '2048' | 'sudoku' | 'maze';
 
@@ -201,6 +201,61 @@ function Maze(){
   </div>;
 }
 
+
+
+function Tango() {
+  type Cell = 'sun' | 'moon' | null;
+  const solution:Cell[][] = [
+    ['sun','sun','moon','moon','sun','moon'],
+    ['moon','moon','sun','sun','moon','sun'],
+    ['sun','moon','sun','moon','moon','sun'],
+    ['moon','sun','moon','sun','sun','moon'],
+    ['moon','sun','sun','moon','sun','moon'],
+    ['sun','moon','moon','sun','moon','sun'],
+  ];
+  const clue:Array<Array<Cell>> = [
+    ['sun',null,null,'moon',null,null],
+    [null,'moon',null,null,'moon',null],
+    [null,null,'sun',null,null,'sun'],
+    ['moon',null,null,'sun',null,null],
+    [null,'sun',null,null,'sun',null],
+    [null,null,'moon',null,null,'sun'],
+  ];
+  const links:Array<{r1:number;c1:number;r2:number;c2:number;kind:'same'|'diff'}> = [
+    {r1:0,c1:1,r2:0,c2:2,kind:'diff'},{r1:0,c1:2,r2:0,c2:3,kind:'same'},
+    {r1:1,c1:0,r2:1,c2:1,kind:'same'},{r1:1,c1:3,r2:1,c2:4,kind:'diff'},
+    {r1:2,c1:2,r2:2,c2:3,kind:'diff'},{r1:2,c1:3,r2:2,c2:4,kind:'same'},
+    {r1:3,c1:0,r2:3,c2:1,kind:'diff'},{r1:4,c1:2,r2:4,c2:3,kind:'diff'},
+    {r1:5,c1:2,r2:5,c2:3,kind:'same'},
+    {r1:0,c1:2,r2:1,c2:2,kind:'diff'},{r1:2,c1:4,r2:3,c2:4,kind:'diff'},
+  ];
+  const [board,setBoard]=useState<Cell[][]>(()=>clue.map(r=>[...r]));
+  const [solved,setSolved]=useState(false),[mistakes,setMistakes]=useState(0);
+  const setCell=(r:number,c:number)=>{ if(clue[r][c]) return; setBoard(prev=>{const next=prev.map(row=>[...row]); next[r][c]=next[r][c]===null?'sun':next[r][c]==='sun'?'moon':null; return next;}); setSolved(false); };
+  const check=()=>{
+    let ok=true;
+    for(let r=0;r<6;r++){
+      const row=board[r]; if(row.some(v=>v===null)||row.filter(v=>v==='sun').length!==3) ok=false;
+      for(let c=0;c<4;c++) if(row[c]&&row[c]===row[c+1]&&row[c+1]===row[c+2]) ok=false;
+    }
+    for(let c=0;c<6;c++){
+      const col=board.map(row=>row[c]); if(col.some(v=>v===null)||col.filter(v=>v==='sun').length!==3) ok=false;
+      for(let r=0;r<4;r++) if(col[r]&&col[r]===col[r+1]&&col[r+1]===col[r+2]) ok=false;
+    }
+    for(const l of links){const a=board[l.r1][l.c1],b=board[l.r2][l.c2];if(!a||!b||(l.kind==='same'?a!==b:a===b))ok=false;}
+    if(ok&&board.every(row=>row.every(Boolean))){setSolved(true);return;}
+    setMistakes(x=>x+1);
+  };
+  const reset=()=>{setBoard(clue.map(r=>[...r]));setSolved(false);setMistakes(0)};
+  return <div className="game-panel">
+    <div className="game-topline"><div><span>Grid</span><strong>6 × 6</strong></div><div><span>Mistakes</span><strong>{mistakes}</strong></div><div><span>Rule</span><strong>{solved?'Solved':'3 + 3 symbols'}</strong></div></div>
+    <p className="game-instructions">Fill each row and column with 3 suns and 3 moons. Never place three identical symbols together. Symbols joined by <b>=</b> must match; <b>×</b> must differ.</p>
+    <div className="tango-grid">
+      {Array.from({length:6*6},(_,i)=>{const r=Math.floor(i/6),c=i%6;const value=board[r][c];return <button key={i} onClick={()=>setCell(r,c)} className={'tango-cell '+(value||'empty')+(clue[r][c]?' fixed':'')} aria-label={'Tango row '+(r+1)+' column '+(c+1)}>{value==='sun'?'☀':value==='moon'?'●':''}{links.filter(l=>l.r1===r&&l.c1===c).map((l,idx)=><span key={'r'+idx} className={'tango-link '+l.kind}>{l.kind==='same'?'=':'×'}</span>)}</button>})}
+    </div>
+    <div className="game-actions"><button className="lab-button primary" onClick={check}>{solved?'Solved ✓':'Check solution'}</button><button className="lab-button" onClick={reset}><RotateCcw size={13}/> Reset</button><span className="game-status">Original Tango-style logic puzzle · no backend.</span></div>
+  </div>;
+}
 export default function BrainLab(){
   const [game,setGame]=useState<Game>('memory');
   const tabs=useMemo(()=>[
@@ -209,13 +264,13 @@ export default function BrainLab(){
     {id:'reaction' as const,label:'Reaction',note:'Human timing',icon:Clock3},
     {id:'2048' as const,label:'2048',note:'Grid logic',icon:Grid2X2},
     {id:'sudoku' as const,label:'Sudoku',note:'Backtracking',icon:Grid2X2},
-    {id:'maze' as const,label:'Maze Solver',note:'BFS · DFS · A*',icon:Zap}
+    {id:'maze' as const,label:'Maze Solver',note:'BFS · DFS · A*',icon:Zap},\n    {id:'tango' as const,label:'Tango Logic',note:'Equal / different',icon:Sun}
   ],[]);
   return <div className="brain-lab">
     <div className="lab-tabs">{tabs.map(({id,label,note,icon:Icon})=><button className={game===id?'active':''} onClick={()=>setGame(id)} key={id}><Icon size={14}/><span>{label}</span><small>{note}</small></button>)}</div>
     <div className="lab-caption"><span>client-side experiments</span><span>•</span><span>scores stored locally</span><span>•</span><span>no backend</span></div>
     <AnimatePresence mode="wait">
-      <motion.div key={game} initial={{opacity:0,y:10}} animate={{opacity:1,y:0}} exit={{opacity:0,y:-8}} transition={{duration:.22}}>{game==='memory'&&<Memory/>}{game==='tic'&&<Tic/>}{game==='reaction'&&<Reaction/>}{game==='2048'&&<Game2048/>}{game==='sudoku'&&<Sudoku/>}{game==='maze'&&<Maze/>}</motion.div>
+      <motion.div key={game} initial={{opacity:0,y:10}} animate={{opacity:1,y:0}} exit={{opacity:0,y:-8}} transition={{duration:.22}}>{game==='memory'&&<Memory/>}{game==='tic'&&<Tic/>}{game==='reaction'&&<Reaction/>}{game==='2048'&&<Game2048/>}{game==='sudoku'&&<Sudoku/>}{game==='maze'&&<Maze/>}{game==='tango'&&<Tango/>}</motion.div>
     </AnimatePresence>
   </div>;
 }
