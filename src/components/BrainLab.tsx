@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { ArrowUpDown, Brain, Check, Clock3, Grid2X2, Lightbulb, RotateCcw, Sun, Trophy, Zap } from 'lucide-react';
 
-type Game = 'memory' | 'tic' | 'reaction' | '2048' | 'sudoku' | 'maze' | 'tango' | 'crossclimb';
+type Game = 'tic' | '2048' | 'sudoku' | 'maze' | 'wend';
 
 const emptyBoard = Array.from({ length: 9 }, () => null as 'X' | 'O' | null);
 
@@ -434,17 +434,13 @@ function Wend() {
 }
 
 export default function BrainLab(){
-  const [game,setGame]=useState<Game>('memory');
+  const [game,setGame]=useState<Game>('tic');
   const tabs=useMemo(()=>[
-    {id:'memory' as const,label:'Memory',note:'Sequence recall',icon:Brain},
     {id:'tic' as const,label:'Tic-Tac-Toe',note:'Minimax AI',icon:Trophy},
-    {id:'reaction' as const,label:'Reaction',note:'Human timing',icon:Clock3},
     {id:'2048' as const,label:'2048',note:'Grid logic',icon:Grid2X2},
     {id:'sudoku' as const,label:'Sudoku',note:'Backtracking',icon:Grid2X2},
     {id:'maze' as const,label:'Maze Solver',note:'BFS · DFS · A*',icon:Zap},
-    {id:'tango' as const,label:'Tango Logic',note:'Equal / different',icon:Sun},
-    {id:'wend' as const,label:'Wend',note:'Drag to make words',icon:ArrowUpDown},
-    {id:'crossclimb' as const,label:'Crossclimb',note:'Word ladder',icon:ArrowUpDown}
+    {id:'wend' as const,label:'Wend',note:'Drag to make words',icon:ArrowUpDown}
   ],[]);
   return <div className="brain-lab">
     <div className="lab-tabs">{tabs.map(({id,label,note,icon:Icon})=><button className={game===id?'active':''} onClick={()=>setGame(id)} key={id}><Icon size={14}/><span>{label}</span><small>{note}</small></button>)}</div>
