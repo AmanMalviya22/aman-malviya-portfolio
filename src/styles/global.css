@@ -119,13 +119,13 @@ h1{margin:0;font-size:clamp(48px,6.2vw,82px);line-height:.97;letter-spacing:-.05
 .wend-help{display:flex;gap:20px;flex-wrap:wrap;margin:0 0 22px;color:#798096;font-size:10px}
 .wend-layout{display:grid;grid-template-columns:minmax(300px,520px) minmax(180px,1fr);gap:34px;align-items:start}
 .wend-board-wrap{position:relative;width:min(500px,100%);aspect-ratio:1;padding:6px}
-.wend-grid{position:relative;z-index:2;width:100%;height:100%;display:grid;grid-template-columns:repeat(5,1fr);gap:7px}
+.wend-grid{position:relative;z-index:2;width:100%;height:100%;display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
 .wend-lines{position:absolute;z-index:3;inset:6px;pointer-events:none;width:calc(100% - 12px);height:calc(100% - 12px);overflow:visible}
-.wend-lines polyline{fill:none;stroke:#646b80;stroke-width:12;stroke-linecap:round;stroke-linejoin:round;opacity:.42}
+.wend-lines polyline{fill:none;stroke:#646b80;stroke-width:9;stroke-linecap:round;stroke-linejoin:round;opacity:.42}
 .wend-lines .active-path{stroke:#8b83ff;opacity:.8;filter:drop-shadow(0 0 6px rgba(139,131,255,.25))}
 .wend-cell{position:relative;z-index:2;min-width:0;min-height:44px;border:1px solid rgba(255,255,255,.07);border-radius:12px;background:#10162a;color:#e8eaf2;font:700 clamp(18px,3vw,27px)/1 ui-monospace,SFMono-Regular,Menlo,monospace;touch-action:none;user-select:none;-webkit-user-select:none;transition:transform .15s ease,border-color .15s ease,background .15s ease}
 .wend-cell:hover{transform:translateY(-1px);border-color:rgba(255,255,255,.14)}
-.wend-cell.current{background:#5149a9;border-color:#9a92ff;color:#fff;transform:scale(.96)}
+.wend-cell.current{background:#5149a9;border-color:#9a92ff;color:#fff;transform:scale(.95)}
 .wend-cell.found{background:rgba(93,214,170,.11);border-color:rgba(93,214,170,.22);color:#b6f0dc}
 .wend-cell.hinted{box-shadow:0 0 0 3px rgba(255,198,112,.22),0 0 22px rgba(255,198,112,.12);border-color:rgba(255,198,112,.45)}
 .wend-word-list{display:grid;gap:8px}
@@ -137,7 +137,7 @@ h1{margin:0;font-size:clamp(48px,6.2vw,82px);line-height:.97;letter-spacing:-.05
 .wend-complete{padding:11px 12px;border:1px solid rgba(93,214,170,.18);border-radius:9px;color:#b7eeda;background:rgba(93,214,170,.06);font-size:10px}
 @media (hover:hover) and (pointer:fine){.wend-cell:hover:not(.current):not(.found){box-shadow:0 8px 20px rgba(0,0,0,.14)}}
 @media (max-width:850px){.wend-layout{grid-template-columns:1fr}.wend-board-wrap{max-width:520px}.wend-word-list{max-width:520px}}
-@media (max-width:560px){.wend-panel{padding:15px}.wend-grid{gap:4px}.wend-cell{border-radius:9px;font-size:18px}.wend-lines{inset:5px;width:calc(100% - 10px);height:calc(100% - 10px)}.wend-help{gap:8px;line-height:1.5}}
+@media (max-width:560px){.wend-panel{padding:15px}.wend-grid{gap:3px}.wend-cell{border-radius:8px;font-size:16px}.wend-lines{inset:5px;width:calc(100% - 10px);height:calc(100% - 10px)}.wend-help{gap:8px;line-height:1.5}}
 
 
 /* Game engagement + mobile polish */
