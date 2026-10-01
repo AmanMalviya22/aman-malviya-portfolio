@@ -68,35 +68,77 @@ function Reaction() {
   return <div className="game-panel"><div className="game-topline"><div><span>Best</span><strong>{best?best+' ms':'—'}</strong></div><div><span>Signal</span><strong>{state==='go'?'GO':'READY'}</strong></div><div><span>Rule</span><strong>React, don't guess</strong></div></div><motion.button whileTap={{scale:.995}} className={'reaction-zone state-'+state} onClick={act}><Zap size={25}/><strong>{label}</strong><span>{state==='armed'?'Clicking early ends the attempt':'Measure your visual reaction time'}</span></motion.button><div className="game-actions"><button className="lab-button" onClick={()=>{setState('idle');setScore(null)}}><RotateCcw size={13}/> Reset</button></div></div>;
 }
 
-type Tile = { id:number; value:number };
-const spawn2048=(tiles:Tile[])=>[...tiles,{id:Date.now()+Math.random(),value:Math.random()<.9?2:4}];
+type Board2048 = number[];
 
-function slideLine(line:number[]) {
-  const values=line.filter(Boolean),out:number[]=[];
-  for(let i=0;i<values.length;i++){if(values[i]===values[i+1]){out.push(values[i]*2);i++;}else out.push(values[i]);}
-  while(out.length<4)out.push(0);return {out,score:out.reduce((a,v)=>a+v,0)-values.reduce((a,v)=>a+v,0)};
+function empty2048(): Board2048 {
+  const b=Array(16).fill(0);
+  addRandom2048(b); addRandom2048(b);
+  return b;
 }
-function boardValues(tiles:Tile[]){const arr=Array(16).fill(0);tiles.forEach((t,i)=>arr[i]=t.value);return arr;}
+function addRandom2048(board:Board2048){
+  const free=board.map((v,i)=>v===0?i:-1).filter(i=>i>=0);
+  if(!free.length)return;
+  const spot=free[Math.floor(Math.random()*free.length)];
+  board[spot]=Math.random()<0.9?2:4;
+}
+function compress2048(line:number[]){
+  const values=line.filter(Boolean),out:number[]=[],merges:number[]=[];
+  for(let i=0;i<values.length;i++){
+    if(values[i]===values[i+1]){const merged=values[i]*2;out.push(merged);merges.push(merged);i++;}
+    else out.push(values[i]);
+  }
+  while(out.length<4)out.push(0);
+  return {out,gained:merges.reduce((a,v)=>a+v,0)};
+}
+function moved2048(board:Board2048,dir:'L'|'R'|'U'|'D'){
+  const next=Array(16).fill(0);let gained=0;
+  for(let line=0;line<4;line++){
+    let input:number[]=[];
+    if(dir==='L'||dir==='R') for(let i=0;i<4;i++) input.push(board[line*4+i]);
+    else for(let i=0;i<4;i++) input.push(board[i*4+line]);
+    if(dir==='R'||dir==='D')input.reverse();
+    const result=compress2048(input);gained+=result.gained;
+    const out=(dir==='R'||dir==='D')?result.out.reverse():result.out;
+    if(dir==='L'||dir==='R')for(let i=0;i<4;i++)next[line*4+i]=out[i];
+    else for(let i=0;i<4;i++)next[i*4+line]=out[i];
+  }
+  return {next,gained,changed:next.some((v,i)=>v!==board[i])};
+}
+function canMove2048(board:Board2048){
+  if(board.some(v=>v===0))return true;
+  for(let r=0;r<4;r++)for(let c=0;c<4;c++){
+    const v=board[r*4+c];
+    if(c<3&&v===board[r*4+c+1])return true;
+    if(r<3&&v===board[(r+1)*4+c])return true;
+  }
+  return false;
+}
 function Game2048(){
-  const initial=[0,5].map((_,i)=>({id:i,value:Math.random()<.9?2:4} as Tile));
-  const [tiles,setTiles]=useState<Tile[]>(initial),[score,setScore]=useState(0),[best,setBest]=useState(()=>Number(localStorage.getItem('brain-2048-best')||0));
-  const reset=()=>{const fresh=[{id:Date.now(),value:2},{id:Date.now()+1,value:4}];setTiles(fresh);setScore(0)};
-  useEffect(()=>{const onKey=(e:KeyboardEvent)=>{const key=e.key.toLowerCase();if(!['arrowup','arrowdown','arrowleft','arrowright','w','a','s','d'].includes(key))return;e.preventDefault();move(key)};window.addEventListener('keydown',onKey);return()=>window.removeEventListener('keydown',onKey)});
-  const move=(key:string)=>{
-    const b=boardValues(tiles),next=Array(16).fill(0),dirs=key==='arrowleft'||key==='a'?'L':key==='arrowright'||key==='d'?'R':key==='arrowup'||key==='w'?'U':'D';let gained=0;
-    const rows=dirs==='L'||dirs==='R'?[0,1,2,3]:[0,4,8,12];
-    rows.forEach(base=>{let line:number[]=[];if(dirs==='L'||dirs==='R')for(let k=0;k<4;k++)line.push(b[base+k]);else for(let k=0;k<4;k++)line.push(b[base+k*4]);
-      if(dirs==='R'||dirs==='D')line.reverse();const result=slideLine(line);gained+=result.score;const out=dirs==='R'||dirs==='D'?result.out.reverse():result.out;
-      for(let k=0;k<4;k++) if(dirs==='L'||dirs==='R')next[base+k]=out[k]; else next[base+k*4]=out[k];
-    });
-    if(next.every((v,i)=>v===b[i]))return;
-    const mapped=next.map((v,i)=>v?{id:tiles.find(t=>boardValues(tiles)[i]===v)?.id??Date.now()+i,value:v}:null).filter(Boolean) as Tile[];
-    const free=next.map((v,i)=>v?i:-1).filter(i=>i>=0);const _=free.length;
-    const fresh=spawn2048(mapped);setTiles(fresh);const s=score+gained;setScore(s);if(s>best){setBest(s);localStorage.setItem('brain-2048-best',String(s))}
-  };
+  const [board,setBoard]=useState<Board2048>(()=>empty2048());
+  const [score,setScore]=useState(0);
+  const [best,setBest]=useState(()=>Number(localStorage.getItem('brain-2048-best')||0));
+  const [over,setOver]=useState(false);
+  const reset=()=>{setBoard(empty2048());setScore(0);setOver(false)};
+  useEffect(()=>{
+    const onKey=(e:KeyboardEvent)=>{
+      const key=e.key.toLowerCase();
+      const map:Record<string,'L'|'R'|'U'|'D'>={arrowleft:'L',a:'L',arrowright:'R',d:'R',arrowup:'U',w:'U',arrowdown:'D',s:'D'};
+      if(!map[key])return;
+      e.preventDefault();
+      const result=moved2048(board,map[key]);
+      if(!result.changed)return;
+      const next=[...result.next];addRandom2048(next);setBoard(next);
+      const s=score+result.gained;setScore(s);
+      if(s>best){setBest(s);localStorage.setItem('brain-2048-best',String(s))}
+      setOver(!canMove2048(next));
+    };
+    window.addEventListener('keydown',onKey);
+    return()=>window.removeEventListener('keydown',onKey);
+  },[board,score,best]);
   return <div className="game-panel">
     <div className="game-topline"><div><span>Score</span><strong>{score}</strong></div><div><span>Best</span><strong>{best}</strong></div><div><span>Controls</span><strong>WASD / arrows</strong></div></div>
-    <div className="game-2048">{boardValues(tiles).map((v,i)=><motion.div layout key={i} className={'tile-2048 v-'+v}>{v||''}</motion.div>)}</div>
+    {over&&<div className="game-over">No moves left. Start a new board.</div>}
+    <div className="game-2048">{board.map((v,i)=><motion.div layout key={i} className={'tile-2048 v-'+v}>{v||''}</motion.div>)}</div>
     <div className="game-actions"><button className="lab-button" onClick={reset}><RotateCcw size={13}/> New board</button><span className="game-status">Combine equal tiles to reach 2048.</span></div>
   </div>;
 }
@@ -123,18 +165,37 @@ type Node={r:number;c:number};
 function Maze(){
   const size=15;
   const [algorithm,setAlgorithm]=useState<'BFS'|'DFS'|'A*'>('A*');
-  const [path,setPath]=useState<Set<string>>(new Set());
-  const [visited,setVisited]=useState<Set<string>>(new Set());
-  const start:Node={r:0,c:0},end:Node={r:size-1,c:size-1};
+  const [path,setPath]=useState<Set<string>>(new Set()),[visited,setVisited]=useState<Set<string>>(new Set());
+  const startNode={r:0,c:0},endNode={r:size-1,c:size-1};
+  const key=(n:Node)=>n.r+','+n.c;
   const wall=(r:number,c:number)=>((r*17+c*31)%11)<3 && !(r===0&&c<3) && !(c===size-1&&r>size-4);
   const solve=()=>{
-    const key=(n:Node)=>n.r+','+n.c;const queue:Node[]=[start],seen=new Set([key(start)]),prev=new Map<string,string>();
-    while(queue.length){const cur=algorithm==='DFS'?queue.pop()!:queue.shift()!;if(cur.r===end.r&&cur.c===end.c)break;for(const [dr,dc] of [[1,0],[-1,0],[0,1],[0,-1]]){const n={r:cur.r+dr,c:cur.c+dc};if(n.r<0||n.r>=size||n.c<0||n.c>=size||wall(n.r,n.c)||seen.has(key(n)))continue;seen.add(key(n));prev.set(key(n),key(cur));queue.push(n)}}
-    const finalKey=key(end);const p=new Set<string>();let at=finalKey;while(at){p.add(at);if(at===key(start))break;at=prev.get(at)||''}setVisited(seen);setPath(p);
+    const score=new Map<string,number>([[key(startNode),0]]);
+    const prev=new Map<string,string>();const seen=new Set<string>();const frontier:{node:Node;priority:number}[]=[{node:startNode,priority:0}];
+    const pop=()=>{frontier.sort((a,b)=>a.priority-b.priority);return algorithm==='DFS'?frontier.pop()!:frontier.shift()!};
+    while(frontier.length){
+      const current=pop();const curKey=key(current.node);if(seen.has(curKey))continue;seen.add(curKey);
+      if(curKey===key(endNode))break;
+      for(const [dr,dc] of [[1,0],[-1,0],[0,1],[0,-1]]){
+        const next={r:current.node.r+dr,c:current.node.c+dc};
+        if(next.r<0||next.r>=size||next.c<0||next.c>=size||wall(next.r,next.c))continue;
+        const nk=key(next),g=(score.get(curKey)??0)+1;
+        if(!score.has(nk)||g<(score.get(nk)??Infinity)){
+          score.set(nk,g);prev.set(nk,curKey);
+          const h=Math.abs(next.r-endNode.r)+Math.abs(next.c-endNode.c);
+          const priority=algorithm==='A*'?g+h:(algorithm==='BFS'?g:0);
+          frontier.push({node:next,priority});
+        }
+      }
+    }
+    const p=new Set<string>();let at=key(endNode);
+    if(!prev.has(at)&&at!==key(startNode)){setVisited(seen);setPath(p);return;}
+    while(at){p.add(at);if(at===key(startNode))break;at=prev.get(at)||''}
+    setVisited(seen);setPath(p);
   };
   return <div className="game-panel">
     <div className="game-topline"><div><span>Algorithm</span><strong>{algorithm}</strong></div><div><span>Nodes</span><strong>{visited.size||'—'}</strong></div><div><span>Path</span><strong>{path.size||'—'} steps</strong></div></div>
-    <div className="maze-toolbar">{(['BFS','DFS','A*'] as const).map(a=><button className={'lab-button '+(algorithm===a?'selected':'')} onClick={()=>setAlgorithm(a)} key={a}>{a}</button>)}</div>
+    <div className="maze-toolbar">{(['BFS','DFS','A*'] as const).map(a=><button className={'lab-button '+(algorithm===a?'selected':'')} onClick={()=>{setAlgorithm(a);setPath(new Set());setVisited(new Set())}} key={a}>{a}</button>)}</div>
     <div className="maze-grid">{Array.from({length:size*size},(_,i)=>{const r=Math.floor(i/size),c=i%size,k=r+','+c;return <div key={k} className={'maze-cell '+(wall(r,c)?'wall ':'')+(visited.has(k)?'visited ':'')+(path.has(k)?'path ':'')+(r===0&&c===0?'start ':'')+(r===size-1&&c===size-1?'end ':'')}></div>})}</div>
     <div className="game-actions"><button className="lab-button primary" onClick={solve}>Run {algorithm}</button><span className="game-status">Find a route from S to E.</span></div>
   </div>;
