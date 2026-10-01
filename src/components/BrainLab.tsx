@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
-import { Brain, Clock3, Grid2X2, RotateCcw, Sun, Trophy, Zap } from 'lucide-react';
+import { ArrowUpDown, Brain, Check, Clock3, Grid2X2, Lightbulb, RotateCcw, Sun, Trophy, Zap } from 'lucide-react';
 
-type Game = 'memory' | 'tic' | 'reaction' | '2048' | 'sudoku' | 'maze' | 'tango';
+type Game = 'memory' | 'tic' | 'reaction' | '2048' | 'sudoku' | 'maze' | 'tango' | 'crossclimb';
 
 const emptyBoard = Array.from({ length: 9 }, () => null as 'X' | 'O' | null);
 
@@ -256,6 +256,261 @@ function Tango() {
     <div className="game-actions"><button className="lab-button primary" onClick={check}>{solved?'Solved ✓':'Check solution'}</button><button className="lab-button" onClick={reset}><RotateCcw size={13}/> Reset</button><span className="game-status">Original Tango-style logic puzzle · no backend.</span></div>
   </div>;
 }
+
+function Crossclimb() {
+  type Rung = { id: string; answer: string; clue: string; locked?: boolean };
+
+  const puzzle = useMemo<Rung[]>(() => [
+    { id: 'top', answer: 'COLD', clue: 'Not warm', locked: true },
+    { id: 'r1', answer: 'CORD', clue: 'A length of rope or string-like material' },
+    { id: 'r2', answer: 'CARD', clue: 'Plastic used for payment or identification' },
+    { id: 'r3', answer: 'WARD', clue: 'A person under someone’s care' },
+    { id: 'r4', answer: 'WARM', clue: 'Comfortably hot' },
+    { id: 'r5', answer: 'WORM', clue: 'A small soft-bodied invertebrate' },
+    { id: 'bottom', answer: 'WORD', clue: 'A unit of language', locked: true }
+  ], []);
+
+  const middleInitial = useMemo(() => puzzle.slice(1,-1), [puzzle]);
+  const [rungs, setRungs] = useState<Rung[]>(middleInitial);
+  const [answers, setAnswers] = useState<Record<string,string>>({});
+  const [topAnswer, setTopAnswer] = useState('');
+  const [bottomAnswer, setBottomAnswer] = useState('');
+  const [revealed, setRevealed] = useState<Record<string,number>>({});
+  const [autoCheck, setAutoCheck] = useState(false);
+  const [autoReorder, setAutoReorder] = useState(false);
+  const [selected, setSelected] = useState<string | null>(null);
+  const [dragId, setDragId] = useState<string | null>(null);
+  const [started, setStarted] = useState<number | null>(null);
+  const [elapsed, setElapsed] = useState(0);
+  const [mistakes, setMistakes] = useState(0);
+  const [hints, setHints] = useState(0);
+  const [status, setStatus] = useState('Solve each clue, then arrange the ladder.');
+  const [solved, setSolved] = useState(false);
+  const [best, setBest] = useState<number | null>(null);
+
+  useEffect(() => {
+    const saved = Number(localStorage.getItem('brain-crossclimb-best') || 0);
+    if (saved) setBest(saved);
+  }, []);
+
+  useEffect(() => {
+    if (!started || solved) return;
+    const id = window.setInterval(() => setElapsed(performance.now() - started), 100);
+    return () => window.clearInterval(id);
+  }, [started, solved]);
+
+  const formatTime = (ms:number) => {
+    const total = Math.floor(ms / 1000);
+    return String(Math.floor(total / 60)).padStart(2,'0') + ':' + String(total % 60).padStart(2,'0');
+  };
+
+  const oneLetterApart = (a:string,b:string) => {
+    if (a.length !== b.length) return false;
+    let diff = 0;
+    for (let i=0;i<a.length;i++) if (a[i] !== b[i] && ++diff > 1) return false;
+    return diff === 1;
+  };
+
+  const normalized = (value:string) => value.trim().toUpperCase().replace(/[^A-Z]/g,'');
+
+  const kickOff = () => {
+    if (!started) setStarted(performance.now());
+  };
+
+  const revealLetter = (id:string, answer:string) => {
+    kickOff();
+    setHints(x => x + 1);
+    setRevealed(prev => ({...prev, [id]: Math.min((prev[id] ?? 0) + 1, answer.length)}));
+    setStatus('Hint used — a letter has been revealed.');
+  };
+
+  const revealRow = (id:string, answer:string) => {
+    kickOff();
+    setHints(x => x + 1);
+    setAnswers(prev => ({...prev, [id]: answer}));
+    setRevealed(prev => ({...prev, [id]: answer.length}));
+    setStatus('Row revealed. Keep climbing.');
+    if (autoReorder) maybeAutoReorder();
+  };
+
+  const maybeAutoReorder = () => {
+    setRungs(prev => {
+      const correct = [...middleInitial];
+      correct.sort((a,b) => a.answer.localeCompare(b.answer));
+      return prev.length === correct.length ? correct : prev;
+    });
+  };
+
+  const handleInput = (id:string,value:string,isTop=false,isBottom=false) => {
+    kickOff();
+    const clean = normalized(value).slice(0,4);
+    if (isTop) setTopAnswer(clean);
+    else if (isBottom) setBottomAnswer(clean);
+    else setAnswers(prev => ({...prev,[id]:clean}));
+
+    if (autoCheck) {
+      const target = puzzle.find(r => r.id === id);
+      if (target && clean && clean !== target.answer) setStatus('That entry does not match the clue.');
+      else if (target && clean === target.answer) setStatus('Correct clue answer.');
+    }
+  };
+
+  const validateMiddle = () => {
+    let ok = true;
+    for (const rung of rungs) {
+      if (normalized(answers[rung.id] || '') !== rung.answer) ok = false;
+    }
+    if (!ok) {
+      setMistakes(x => x + 1);
+      setStatus('Some clue answers are incorrect. Use a hint or try again.');
+      return false;
+    }
+    return true;
+  };
+
+  const ladderValid = () => {
+    const values = rungs.map(r => normalized(answers[r.id] || '') || '----');
+    return values.every((word,i) => i===0 || oneLetterApart(values[i-1],word));
+  };
+
+  const unlock = () => {
+    kickOff();
+    if (!validateMiddle()) return;
+    if (!ladderValid()) {
+      setMistakes(x => x + 1);
+      setStatus('Your words are right, but the ladder order is not. Rearrange the middle rungs.');
+      return;
+    }
+    setStatus('Ladder unlocked. Solve the final top and bottom clues.');
+  };
+
+  const checkFinal = () => {
+    kickOff();
+    const top = normalized(topAnswer), bottom = normalized(bottomAnswer);
+    const middle = rungs.map(r => normalized(answers[r.id] || ''));
+    if (!validateMiddle() || !ladderValid()) return;
+    if (top !== 'COLD' || bottom !== 'WORD') {
+      setMistakes(x => x + 1);
+      setStatus('The final clues are not correct yet.');
+      return;
+    }
+    if (!oneLetterApart(top,middle[0]) || !oneLetterApart(middle[middle.length-1],bottom)) {
+      setMistakes(x => x + 1);
+      setStatus('The final words must also be one letter apart from their neighbors.');
+      return;
+    }
+    setSolved(true);
+    const finalTime = Math.max(1, performance.now() - (started ?? performance.now()));
+    setElapsed(finalTime);
+    if (!best || finalTime < best) {
+      setBest(finalTime);
+      localStorage.setItem('brain-crossclimb-best', String(finalTime));
+    }
+    setStatus('Ladder complete. Nice climb.');
+  };
+
+  const dragStart = (id:string) => setDragId(id);
+  const drop = (targetId:string) => {
+    if (!dragId || dragId === targetId) return;
+    setRungs(prev => {
+      const next = [...prev];
+      const from = next.findIndex(r => r.id === dragId);
+      const to = next.findIndex(r => r.id === targetId);
+      const [item] = next.splice(from,1);
+      next.splice(to,0,item);
+      return next;
+    });
+    setDragId(null);
+  };
+
+  const reset = () => {
+    setRungs(middleInitial);
+    setAnswers({});
+    setTopAnswer('');
+    setBottomAnswer('');
+    setRevealed({});
+    setSelected(null);
+    setStarted(null);
+    setElapsed(0);
+    setMistakes(0);
+    setHints(0);
+    setSolved(false);
+    setStatus('Solve each clue, then arrange the ladder.');
+  };
+
+  const renderWordInput = (rung:Rung, index:number, locked=false) => {
+    const value = locked ? (rung.id === 'top' ? topAnswer : bottomAnswer) : (answers[rung.id] || '');
+    const revealedCount = revealed[rung.id] || 0;
+    const target = rung.answer;
+    const prefix = revealedCount ? target.slice(0,revealedCount) : '';
+    const displayValue = revealedCount && !value ? prefix : value;
+    const correct = displayValue === target;
+
+    return <div className={'cross-row '+(locked?'locked ':'')+(correct?'correct ':'')}>
+      <div className="cross-rung-no">{locked ? (index===0?'TOP':'FINAL') : String(index).padStart(2,'0')}</div>
+      <div className="cross-clue">
+        <span className="cross-clue-text">{rung.clue}</span>
+        {!locked && <div className="cross-tools">
+          <button className="cross-mini" onClick={()=>revealLetter(rung.id,target)} title="Reveal one letter"><Lightbulb size={12}/> Hint</button>
+          <button className="cross-mini" onClick={()=>revealRow(rung.id,target)} title="Reveal entire word">Reveal row</button>
+        </div>}
+      </div>
+      <input
+        aria-label={'Answer for clue: '+rung.clue}
+        value={displayValue}
+        placeholder="4 letters"
+        maxLength={4}
+        disabled={locked && !solved}
+        onChange={e=>handleInput(rung.id,e.target.value,rung.id==='top',rung.id==='bottom')}
+        onFocus={kickOff}
+        className={autoCheck && value && !correct ? 'wrong-input' : ''}
+      />
+      <span className="cross-check">{correct ? <Check size={15}/> : ''}</span>
+    </div>;
+  };
+
+  const mixed = rungs;
+  return <div className="game-panel crossclimb-panel">
+    <div className="game-topline">
+      <div><span>Time</span><strong>{formatTime(elapsed)}</strong></div>
+      <div><span>Mistakes</span><strong>{mistakes}</strong></div>
+      <div><span>Hints</span><strong>{hints}</strong></div>
+      <div><span>Best</span><strong>{best ? formatTime(best) : '—'}</strong></div>
+    </div>
+
+    <div className="cross-intro">
+      <p className="game-instructions">Solve the clues. Then arrange the middle words so each neighboring word differs by exactly one letter.</p>
+      <div className="cross-toggles">
+        <label><input type="checkbox" checked={autoCheck} onChange={e=>setAutoCheck(e.target.checked)}/> Auto-check</label>
+        <label><input type="checkbox" checked={autoReorder} onChange={e=>setAutoReorder(e.target.checked)}/> Auto-reorder</label>
+      </div>
+    </div>
+
+    <div className="cross-ladder">
+      {renderWordInput(puzzle[0],0,true)}
+      <div className="cross-middle">
+        {mixed.map((rung,index) => (
+          <div key={rung.id} className="cross-drag-wrap" draggable={!solved} onDragStart={()=>dragStart(rung.id)} onDragOver={e=>e.preventDefault()} onDrop={()=>drop(rung.id)}>
+            <button className={'cross-drag-handle '+(selected===rung.id?'active':'')} onClick={()=>setSelected(rung.id)} title="Select rung to move"><ArrowUpDown size={13}/></button>
+            {renderWordInput(rung,index+1,false)}
+          </div>
+        ))}
+      </div>
+      {renderWordInput(puzzle[puzzle.length-1],puzzle.length-1,true)}
+    </div>
+
+    <div className="cross-status">{status}</div>
+
+    <div className="game-actions cross-actions">
+      <button className="lab-button primary" onClick={unlock} disabled={solved}>Unlock top & bottom</button>
+      <button className="lab-button primary" onClick={checkFinal} disabled={solved}>Finish ladder</button>
+      <button className="lab-button" onClick={reset}><RotateCcw size={13}/> New puzzle</button>
+    </div>
+
+    <div className="cross-note">Original word-ladder puzzle inspired by the Crossclimb mechanic · client-side only · no backend.</div>
+  </div>;
+}
+
 export default function BrainLab(){
   const [game,setGame]=useState<Game>('memory');
   const tabs=useMemo(()=>[
@@ -265,13 +520,14 @@ export default function BrainLab(){
     {id:'2048' as const,label:'2048',note:'Grid logic',icon:Grid2X2},
     {id:'sudoku' as const,label:'Sudoku',note:'Backtracking',icon:Grid2X2},
     {id:'maze' as const,label:'Maze Solver',note:'BFS · DFS · A*',icon:Zap},
-    {id:'tango' as const,label:'Tango Logic',note:'Equal / different',icon:Sun}
+    {id:'tango' as const,label:'Tango Logic',note:'Equal / different',icon:Sun},
+    {id:'crossclimb' as const,label:'Crossclimb',note:'Word ladder',icon:ArrowUpDown}
   ],[]);
   return <div className="brain-lab">
     <div className="lab-tabs">{tabs.map(({id,label,note,icon:Icon})=><button className={game===id?'active':''} onClick={()=>setGame(id)} key={id}><Icon size={14}/><span>{label}</span><small>{note}</small></button>)}</div>
     <div className="lab-caption"><span>client-side experiments</span><span>•</span><span>scores stored locally</span><span>•</span><span>no backend</span></div>
     <AnimatePresence mode="wait">
-      <motion.div key={game} initial={{opacity:0,y:10}} animate={{opacity:1,y:0}} exit={{opacity:0,y:-8}} transition={{duration:.22}}>{game==='memory'&&<Memory/>}{game==='tic'&&<Tic/>}{game==='reaction'&&<Reaction/>}{game==='2048'&&<Game2048/>}{game==='sudoku'&&<Sudoku/>}{game==='maze'&&<Maze/>}{game==='tango'&&<Tango/>}</motion.div>
+      <motion.div key={game} initial={{opacity:0,y:10}} animate={{opacity:1,y:0}} exit={{opacity:0,y:-8}} transition={{duration:.22}}>{game==='memory'&&<Memory/>}{game==='tic'&&<Tic/>}{game==='reaction'&&<Reaction/>}{game==='2048'&&<Game2048/>}{game==='sudoku'&&<Sudoku/>}{game==='maze'&&<Maze/>}{game==='tango'&&<Tango/>}{game==='crossclimb'&&<Crossclimb/>}</motion.div>
     </AnimatePresence>
   </div>;
 }
