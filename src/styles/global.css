@@ -225,3 +225,16 @@ main:focus{outline:none}
   .skill-groups{grid-template-columns:1fr}
   .approach-grid{grid-template-columns:1fr}
 }
+
+
+/* Flagship project presentation */
+.project-featured{grid-column:span 2;padding:25px;background:linear-gradient(145deg,rgba(119,112,255,.075),rgba(255,255,255,.022));border-color:rgba(129,120,255,.2)}
+.project-featured h3{font-size:30px}
+.project-company{margin:8px 0 0!important;color:#7770ff!important;font:700 9px ui-monospace,monospace!important;letter-spacing:.1em;text-transform:uppercase}
+.internal-badge{display:inline-flex;margin-top:17px;padding:7px 9px;border:1px solid rgba(255,198,112,.18);border-radius:999px;background:rgba(255,198,112,.05);color:#9f8a64;font:9px ui-monospace,monospace}
+.project-note{color:#5f6679;font:9px ui-monospace,monospace;line-height:1.5}
+.project-flow{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-top:12px}
+.project-flow span{padding:9px;border:1px solid var(--line);border-radius:9px;background:rgba(255,255,255,.018);color:#858c9f;font-size:9px;line-height:1.35}
+.project-flow b{display:block;margin-bottom:5px;color:#6f68ff;font:700 8px ui-monospace,monospace}
+@media (max-width:900px){.project-featured{grid-column:span 1}.project-flow{grid-template-columns:1fr 1fr}}
+@media (max-width:650px){.project-featured h3{font-size:25px}.project-flow{grid-template-columns:1fr}}
