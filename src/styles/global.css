@@ -238,3 +238,12 @@ main:focus{outline:none}
 .project-flow b{display:block;margin-bottom:5px;color:#6f68ff;font:700 8px ui-monospace,monospace}
 @media (max-width:900px){.project-featured{grid-column:span 1}.project-flow{grid-template-columns:1fr 1fr}}
 @media (max-width:650px){.project-featured h3{font-size:25px}.project-flow{grid-template-columns:1fr}}
+
+
+/* Flagship MCP project case-study */
+.project-story{display:grid;gap:10px;margin:20px 0 4px}
+.project-story>div{padding:13px;border:1px solid rgba(255,255,255,.07);border-radius:11px;background:rgba(5,7,16,.24)}
+.project-story span{display:block;margin-bottom:5px;color:#7f78ff;font:700 8px ui-monospace,monospace;text-transform:uppercase;letter-spacing:.12em}
+.project-story p{margin:0!important;color:#9299aa!important;font-size:11px!important;line-height:1.65!important}
+.project-featured .project-links{padding-top:18px}
+@media (min-width:900px){.project-featured .project-story{grid-template-columns:repeat(3,1fr)}}
