@@ -468,7 +468,7 @@ function Wend(){
       <button className="lab-button" onClick={newPuzzle}>New puzzle</button>
     </div>
 
-    <div className="cross-note">Original hard word-grid challenge · score + streaks saved locally · no backend.</div>
+    <div className="cross-note">Original hard grid-word challenge · score + streaks saved locally · no backend.</div>
   </div>;
 }
 
@@ -476,7 +476,7 @@ export default function BrainLab(){
   const [game,setGame]=useState<Game>('wend');
   const tabs=useMemo(()=>[
     {id:'tic' as const,label:'Tic-Tac-Toe',note:'Minimax AI',icon:Trophy},
-    {id:'wend' as const,label:'Wend',note:'Drag to make words',icon:ArrowUpDown}
+    {id:'wend' as const,label:'Grid Word',note:'Drag to make words',icon:ArrowUpDown}
   ],[]);
 
   return <div className="brain-lab">
