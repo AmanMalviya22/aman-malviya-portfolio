@@ -25,7 +25,7 @@ const skills = ['Java','Spring Boot','Microservices','REST APIs','Distributed Sy
 const projects = [
   { title: 'Payment RCA Copilot', type: 'AI + Backend', text: 'An MCP-powered diagnostic workflow that connects transaction context with operational logs and guides engineers toward faster root-cause analysis.', tags: ['Java','MCP','Claude','SQL'] },
   { title: 'Reference Data Graph', type: 'Platform + Data', text: 'Centralized SWIFT, IFSC, and banking-reference data with fast lookup paths and Redis caching for high-traffic services.', tags: ['Java','Redis','AWS','Caching'] },
-  { title: 'Algorithm Playground', type: 'Interactive', text: 'A browser-native collection of algorithm visualizations and brain games designed to make DSA concepts tangible.', tags: ['Astro','React','TypeScript','DSA'] }
+  { title: 'Brain Lab', type: 'Interactive Systems', text: 'A client-side React playground featuring a minimax Tic-Tac-Toe opponent and a drag-based grid-word puzzle with local scoring and touch support.', tags: ['Astro','React','TypeScript','Algorithms'] }
 ];
 ---
 
@@ -36,11 +36,17 @@ const projects = [
       <nav class="nav-links" aria-label="Primary navigation">
         <a href="#about">About</a><a href="#experience">Experience</a><a href="#skills">Skills</a><a href="#projects">Projects</a><a href="#brain-lab">Brain Lab</a><a href="#contact">Contact</a>
       </nav>
+      <details class="mobile-nav">
+        <summary>Menu</summary>
+        <nav class="mobile-nav-menu" aria-label="Mobile navigation">
+          <a href="#about">About</a><a href="#experience">Experience</a><a href="#skills">Skills</a><a href="#projects">Projects</a><a href="#brain-lab">Brain Lab</a><a href="#contact">Contact</a>
+        </nav>
+      </details>
       <a class="nav-button" href="https://www.linkedin.com/in/aman-malviya22/" target="_blank" rel="noreferrer">Connect ↗</a>
     </div>
   </header>
 
-  <main id="top">
+  <main id="top" tabindex="-1">
     <section class="hero">
       <div class="hero-grid"></div><div class="hero-glow glow-a"></div><div class="hero-glow glow-b"></div>
       <div class="container hero-inner">
