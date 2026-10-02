@@ -155,3 +155,16 @@ h1{margin:0;font-size:clamp(48px,6.2vw,82px);line-height:.97;letter-spacing:-.05
   .game-status{width:100%;order:5;margin-right:0;line-height:1.5}
   .wend-target{min-height:46px}
 }
+
+
+/* Accessibility + responsive navigation polish */
+:focus-visible{outline:2px solid #9b93ff;outline-offset:3px}
+main:focus{outline:none}
+.mobile-nav{display:none;position:relative}
+.mobile-nav summary{list-style:none;cursor:pointer;font-size:11px;color:#dbe0ff;border:1px solid rgba(125,140,255,.25);background:rgba(90,105,255,.08);padding:9px 11px;border-radius:999px}
+.mobile-nav summary::-webkit-details-marker{display:none}
+.mobile-nav-menu{position:absolute;right:0;top:calc(100% + 10px);min-width:190px;display:grid;gap:4px;padding:8px;border:1px solid var(--line);border-radius:14px;background:rgba(9,12,23,.96);backdrop-filter:blur(18px);box-shadow:0 20px 50px rgba(0,0,0,.3)}
+.mobile-nav-menu a{padding:9px 10px;border-radius:8px;color:#9ba1b4;text-decoration:none;font-size:11px}
+.mobile-nav-menu a:hover{color:#fff;background:rgba(255,255,255,.05)}
+@media (max-width:950px){.nav-links{display:none}.mobile-nav{display:block}}
+@media (max-width:650px){.nav-inner{height:66px}.mobile-nav-menu{right:-8px}}
