@@ -5,17 +5,42 @@
 		<meta name="viewport" content="width=device-width" />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<link rel="icon" href="/favicon.ico" />
+		<link rel="canonical" href="https://aman-malviya22.netlify.app/" />
 		<meta name="generator" content={Astro.generator} />
 		<meta name="description" content="Aman Malviya is a backend engineer focused on Java, Spring Boot, distributed systems, cloud infrastructure, payments, and developer tooling." />
+		<meta name="author" content="Aman Malviya" />
 		<meta name="theme-color" content="#070812" />
 		<meta property="og:title" content="Aman Malviya — Backend Engineer" />
 		<meta property="og:description" content="Backend engineering portfolio focused on Java, Spring Boot, distributed systems, cloud infrastructure, payments, and developer tooling." />
 		<meta property="og:type" content="website" />
+		<meta property="og:url" content="https://aman-malviya22.netlify.app/" />
+		<meta property="og:site_name" content="Aman Malviya" />
 		<meta name="twitter:card" content="summary" />
 		<title>Aman Malviya — Backend Engineer | Java, Spring Boot & Distributed Systems</title>
+		<script type="application/ld+json" set:html={JSON.stringify({
+			'@context': 'https://schema.org',
+			'@type': 'Person',
+			name: 'Aman Malviya',
+			url: 'https://aman-malviya22.netlify.app/',
+			jobTitle: 'Backend Engineer',
+			sameAs: [
+				'https://www.linkedin.com/in/aman-malviya22/',
+				'https://github.com/AmanMalviya22'
+			],
+			knowsAbout: [
+				'Java',
+				'Spring Boot',
+				'Microservices',
+				'Distributed Systems',
+				'AWS',
+				'Redis',
+				'Kubernetes',
+				'REST APIs'
+			]
+		})}></script>
 	</head>
 	<body>
-		<a class="skip-link" href="#main-content">Skip to content</a>
+		<a class="skip-link" href="#top">Skip to content</a>
 		<slot />
 	</body>
 </html>
