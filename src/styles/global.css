@@ -187,3 +187,14 @@ main:focus{outline:none}
 .project-story p{margin:0!important;color:#9299aa!important;font-size:11px!important;line-height:1.65!important}
 .project-featured .project-links{padding-top:18px}
 @media (min-width:900px){.project-featured .project-story{grid-template-columns:repeat(3,1fr)}}
+
+
+/* 404 page */
+.not-found{min-height:100vh;display:grid;place-items:center;padding:40px;position:relative;overflow:hidden;background:var(--bg)}
+.not-found:before{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);background-size:64px 64px;mask-image:linear-gradient(#000,transparent 82%);pointer-events:none}
+.not-found-card{position:relative;width:min(680px,100%);padding:40px;border:1px solid var(--line);border-radius:22px;background:rgba(13,16,32,.82);box-shadow:0 30px 100px rgba(0,0,0,.25)}
+.not-found-code{color:#777dff;font:700 10px ui-monospace,monospace;letter-spacing:.14em;text-transform:uppercase}
+.not-found h1{margin:16px 0 14px;font-size:clamp(42px,7vw,70px);max-width:620px}
+.not-found p{max-width:560px;margin:0;color:#9299aa;font-size:16px;line-height:1.7}
+.not-found .actions{margin-top:28px}
+@media (max-width:600px){.not-found{padding:20px}.not-found-card{padding:27px}.not-found p{font-size:14px}}
