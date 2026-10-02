@@ -6,14 +6,40 @@
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<link rel="icon" href="/favicon.ico" />
 		<meta name="generator" content={Astro.generator} />
-		<title>Astro Basics</title>
+		<meta name="description" content="Aman Malviya is a backend engineer focused on Java, Spring Boot, distributed systems, cloud infrastructure, payments, and developer tooling." />
+		<meta name="theme-color" content="#070812" />
+		<meta property="og:title" content="Aman Malviya — Backend Engineer" />
+		<meta property="og:description" content="Backend engineering portfolio focused on Java, Spring Boot, distributed systems, cloud infrastructure, payments, and developer tooling." />
+		<meta property="og:type" content="website" />
+		<meta name="twitter:card" content="summary" />
+		<title>Aman Malviya — Backend Engineer | Java, Spring Boot & Distributed Systems</title>
 	</head>
 	<body>
+		<a class="skip-link" href="#main-content">Skip to content</a>
 		<slot />
 	</body>
 </html>
 
 <style>
+	.skip-link {
+		position: fixed;
+		left: 12px;
+		top: 12px;
+		z-index: 100;
+		transform: translateY(-160%);
+		padding: 10px 14px;
+		border-radius: 10px;
+		background: #f4f6fc;
+		color: #070812;
+		font-size: 12px;
+		font-weight: 700;
+		text-decoration: none;
+	}
+
+	.skip-link:focus {
+		transform: translateY(0);
+	}
+
 	html,
 	body {
 		margin: 0;
