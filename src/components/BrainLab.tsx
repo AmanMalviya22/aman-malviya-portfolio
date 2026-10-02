@@ -204,48 +204,73 @@ type WendPuzzle={
   paths:number[][];
 };
 
-function snakeTour(size:number){
-  const tour:number[]=[];
-  for(let r=0;r<size;r++){
-    if(r%2===0){
-      for(let c=0;c<size;c++) tour.push(r*size+c);
-    }else{
-      for(let c=size-1;c>=0;c--) tour.push(r*size+c);
-    }
-  }
-  return tour;
+type RandomSource=()=>number;
+
+function seededRandom(seed:number):RandomSource{
+  let value=(seed|0)>>>0;
+  return ()=>{
+    value+=0x6D2B79F5;
+    let t=value;
+    t=Math.imul(t^(t>>>15),t|1);
+    t^=t+Math.imul(t^(t>>>7),t|61);
+    return ((t^(t>>>14))>>>0)/4294967296;
+  };
 }
 
-function columnTour(size:number){
-  const tour:number[]=[];
-  for(let c=0;c<size;c++){
-    if(c%2===0){
-      for(let r=0;r<size;r++) tour.push(r*size+c);
-    }else{
-      for(let r=size-1;r>=0;r--) tour.push(r*size+c);
-    }
-  }
-  return tour;
-}
-
-function spiralTour(size:number){
-  const out:number[]=[];
-  let top=0,bottom=size-1,left=0,right=size-1;
-  while(top<=bottom&&left<=right){
-    for(let c=left;c<=right;c++) out.push(top*size+c);
-    top++;
-    for(let r=top;r<=bottom;r++) out.push(r*size+right);
-    right--;
-    if(top<=bottom){
-      for(let c=right;c>=left;c--) out.push(bottom*size+c);
-      bottom--;
-    }
-    if(left<=right){
-      for(let r=bottom;r>=top;r--) out.push(r*size+left);
-      left++;
-    }
+function shuffle<T>(items:T[],random:RandomSource){
+  const out=[...items];
+  for(let i=out.length-1;i>0;i--){
+    const j=Math.floor(random()*(i+1));
+    [out[i],out[j]]=[out[j],out[i]];
   }
   return out;
+}
+
+function snakeTour(size:number,reverseRows=false,reverseColumns=false){
+  const tour:number[]=[];
+  for(let r=0;r<size;r++){
+    const row=reverseRows?size-1-r:r;
+    const leftToRight=r%2===0;
+    for(let offset=0;offset<size;offset++){
+      const c=reverseColumns
+        ? (leftToRight?size-1-offset:offset)
+        : (leftToRight?offset:size-1-offset);
+      tour.push(row*size+c);
+    }
+  }
+  return tour;
+}
+
+function columnTour(size:number,reverseRows=false,reverseColumns=false){
+  const tour:number[]=[];
+  for(let c=0;c<size;c++){
+    const col=reverseColumns?size-1-c:c;
+    const topToBottom=c%2===0;
+    for(let offset=0;offset<size;offset++){
+      const r=reverseRows
+        ? (topToBottom?size-1-offset:offset)
+        : (topToBottom?offset:size-1-offset);
+      tour.push(r*size+col);
+    }
+  }
+  return tour;
+}
+
+function transformTour(tour:number[],size:number,transform:number){
+  const map=(index:number)=>{
+    const r=Math.floor(index/size);
+    const c=index%size;
+    switch(transform){
+      case 1:return c*size+(size-1-r);
+      case 2:return (size-1-r)*size+(size-1-c);
+      case 3:return (size-1-c)*size+r;
+      case 4:return r*size+(size-1-c);
+      case 5:return (size-1-r)*size+c;
+      case 6:return c*size+r;
+      default:return r*size+c;
+    }
+  };
+  return tour.map(map);
 }
 
 function buildWendPuzzle(
@@ -268,22 +293,28 @@ function buildWendPuzzle(
   return {size,grid,words,lengths,paths};
 }
 
-function makeWendPuzzles():WendPuzzle[]{
-  const words=['ARCHITECTURE','DATABASE','LATENCY','THREAD','KERNEL','CACHE','QUEUE'];
-  const reversed=['QUEUE','CACHE','KERNEL','THREAD','LATENCY','DATABASE','ARCHITECTURE'];
-  const rotated=['LATENCY','ARCHITECTURE','CACHE','DATABASE','QUEUE','THREAD','KERNEL'];
+const WEND_WORD_BANKS=[
+  ['ARCHITECTURE','DATABASE','LATENCY','THREAD','KERNEL','CACHE','QUEUE'],
+  ['MICROSERVICE','RESILIENCE','ROUTING','MUTEX','INDEX','ASYNC','CLOUD'],
+  ['OBSERVABILITY','THROUGHPUT','CACHING','EVENTS','QUERY','PROXY','IO'],
+  ['DEPLOYMENT','RELIABILITY','LATENCY','MUTEX','REDIS','QUEUE','KAFKA']
+];
 
-  return [
-    buildWendPuzzle(snakeTour(7),words),
-    buildWendPuzzle(columnTour(7),reversed),
-    buildWendPuzzle(spiralTour(7),rotated)
-  ];
+function makeWendPuzzle(seed:number):WendPuzzle{
+  const random=seededRandom(seed);
+  const bank=WEND_WORD_BANKS[Math.floor(random()*WEND_WORD_BANKS.length)];
+  const words=shuffle(bank,random);
+  const size=7;
+  const baseTour=Math.floor(random()*2)===0
+    ? snakeTour(size,random()>.5,random()>.5)
+    : columnTour(size,random()>.5,random()>.5);
+  const tour=transformTour(baseTour,size,Math.floor(random()*7));
+  return buildWendPuzzle(tour,words);
 }
 
 function Wend(){
-  const puzzles=useMemo(()=>makeWendPuzzles(),[]);
-  const [puzzleIndex,setPuzzleIndex]=useState(0);
-  const puzzle=puzzles[puzzleIndex];
+  const [puzzleSeed,setPuzzleSeed]=useState(20261002);
+  const puzzle=useMemo(()=>makeWendPuzzle(puzzleSeed),[puzzleSeed]);
   const [path,setPath]=useState<number[]>([]);
   const [found,setFound]=useState<string[]>([]);
   const [history,setHistory]=useState<number[][]>([]);
@@ -315,7 +346,7 @@ function Wend(){
     setDragging(false);
     setStreak(0);
     window.localStorage.setItem('brain-wend-streak','0');
-  },[puzzleIndex]);
+  },[puzzleSeed]);
 
   useEffect(()=>{
     if(!started||complete) return;
@@ -451,7 +482,7 @@ function Wend(){
     setMessage('Hint: the highlighted tile is part of the next word.');
   };
 
-  const newPuzzle=()=>setPuzzleIndex(index=>(index+1)%puzzles.length);
+  const newPuzzle=()=>setPuzzleSeed(seed=>seed+1);
   const formed=word(path);
   const points=(ids:number[])=>
     ids.map(i=>((col(i)+0.5)/puzzle.size*500)+','+((row(i)+0.5)/puzzle.size*500)).join(' ');
@@ -470,7 +501,7 @@ function Wend(){
     <div className="wend-progress">
       <div className="wend-progress-track"><span style={{width:(found.length/puzzle.words.length*100)+'%'}} /></div>
       <span>{found.length === puzzle.words.length ? 'Complete' : Math.round(found.length/puzzle.words.length*100)+'% solved'}</span>
-      <span className="wend-puzzle-id">Puzzle {puzzleIndex+1}/{puzzles.length}</span>
+      <span className="wend-puzzle-id">Puzzle #{String(puzzleSeed).slice(-4)}</span>
     </div>
 
     <div className="wend-help">
@@ -478,6 +509,7 @@ function Wend(){
       <span>Drag through adjacent letters</span>
       <span>No diagonals</span>
       <span>Use every tile exactly once</span>
+      <span>New puzzle every run</span>
     </div>
 
     <div className="wend-layout">
