@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
-import { ArrowUpDown, Check, Lightbulb, RotateCcw, Trophy } from 'lucide-react';
+import { ArrowUpDown, Check, Lightbulb, RotateCcw, Sparkles, Timer, Trophy, Zap } from 'lucide-react';
 
 type Game = 'tic' | 'wend';
 
@@ -11,12 +11,21 @@ function storedNumber(key:string, fallback=0){
   return Number(window.localStorage.getItem(key) || fallback);
 }
 
+const WIN_LINES=[[0,1,2],[3,4,5],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+
 function winner(board:(string|null)[]){
-  const lines=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
-  for(const [a,b,c] of lines){
+  for(const [a,b,c] of WIN_LINES){
     if(board[a]&&board[a]===board[b]&&board[a]===board[c]) return board[a];
   }
   return board.every(Boolean) ? 'draw' : null;
+}
+
+function winningCells(board:(string|null)[]){
+  for(const line of WIN_LINES){
+    const [a,b,c]=line;
+    if(board[a]&&board[a]===board[b]&&board[a]===board[c]) return line;
+  }
+  return [];
 }
 
 function minimax(board:(string|null)[], maximizing:boolean):number{
@@ -51,18 +60,25 @@ function aiMove(board:(string|null)[]){
   return pick;
 }
 
+type TicMode='casual'|'perfect';
+
 function Tic(){
   type Result='win'|'loss'|'draw';
   const [board,setBoard]=useState<(string|null)[]>([...emptyBoard]);
   const [thinking,setThinking]=useState(false);
-  const [stats,setStats]=useState(()=>({
-    wins:storedNumber('brain-tic-wins'),
-    losses:storedNumber('brain-tic-losses'),
-    draws:storedNumber('brain-tic-draws'),
-    streak:storedNumber('brain-tic-streak')
-  }));
+  const [mode,setMode]=useState<TicMode>('perfect');
+  const [stats,setStats]=useState(()=>{
+    if(typeof window==='undefined') return {wins:0,losses:0,draws:0,streak:0};
+    return {
+      wins:storedNumber('brain-tic-wins'),
+      losses:storedNumber('brain-tic-losses'),
+      draws:storedNumber('brain-tic-draws'),
+      streak:storedNumber('brain-tic-streak')
+    };
+  });
   const [last,setLast]=useState('');
   const w=winner(board);
+  const winCells=winningCells(board);
 
   const record=(result:Result)=>{
     setStats(prev=>{
@@ -72,12 +88,33 @@ function Tic(){
         draws:prev.draws+(result==='draw'?1:0),
         streak:result==='win'?prev.streak+1:0
       };
-      window.localStorage.setItem('brain-tic-wins',String(next.wins));
-      window.localStorage.setItem('brain-tic-losses',String(next.losses));
-      window.localStorage.setItem('brain-tic-draws',String(next.draws));
-      window.localStorage.setItem('brain-tic-streak',String(next.streak));
+      if(typeof window!=='undefined'){
+        window.localStorage.setItem('brain-tic-wins',String(next.wins));
+        window.localStorage.setItem('brain-tic-losses',String(next.losses));
+        window.localStorage.setItem('brain-tic-draws',String(next.draws));
+        window.localStorage.setItem('brain-tic-streak',String(next.streak));
+      }
       return next;
     });
+  };
+
+  const chooseCasualMove=(board:(string|null)[])=>{
+    const moves=board.map((v,i)=>v?null:i).filter((v):v is number=>v!==null);
+    if(moves.length===0) return 0;
+    const winNow=moves.find(i=>{
+      const next=[...board];
+      next[i]='O';
+      return winner(next)==='O';
+    });
+    if(winNow!==undefined) return winNow;
+    const blockNow=moves.find(i=>{
+      const next=[...board];
+      next[i]='X';
+      return winner(next)==='X';
+    });
+    if(blockNow!==undefined) return blockNow;
+    if(Math.random()<0.45) return moves[Math.floor(Math.random()*moves.length)];
+    return aiMove(board);
   };
 
   const move=(i:number)=>{
@@ -89,14 +126,15 @@ function Tic(){
     setBoard(next);
 
     if(humanResult){
-      setLast(humanResult==='X'?'You win! 🔥':'Draw — rematch?');
-      record(humanResult==='X'?'win':'draw');
+      const result=humanResult==='X'?'win':'draw';
+      setLast(result==='win'?'You cracked the board! 🔥':'Draw — rematch?');
+      record(result);
       return;
     }
 
     setThinking(true);
     window.setTimeout(()=>{
-      const pick=aiMove(next);
+      const pick=mode==='perfect'?aiMove(next):chooseCasualMove(next);
       const out=[...next];
       out[pick]='O';
       const result=winner(out);
@@ -104,10 +142,10 @@ function Tic(){
       setThinking(false);
 
       if(result){
-        setLast(result==='O'?'AI wins — run it back.':'Draw — rematch?');
+        setLast(result==='O'?'AI found the line. Run it back.':'Draw — rematch?');
         record(result==='O'?'loss':'draw');
       }
-    },220);
+    },mode==='perfect'?240:320);
   };
 
   const reset=()=>{
@@ -121,22 +159,38 @@ function Tic(){
       <div><span>Wins</span><strong>{stats.wins}</strong></div>
       <div><span>Losses</span><strong>{stats.losses}</strong></div>
       <div><span>Streak</span><strong>{stats.streak} 🔥</strong></div>
-      <div><span>Engine</span><strong>Minimax</strong></div>
+      <div><span>Mode</span><strong>{mode==='perfect'?'Perfect':'Casual'}</strong></div>
     </div>
 
-    <div className="tic-board">
+    <div className="tic-toolbar">
+      <div className="tic-mode-label"><Zap size={13}/> Choose your opponent</div>
+      <div className="tic-mode-switch" role="group" aria-label="Tic-Tac-Toe difficulty">
+        <button className={mode==='casual'?'selected':''} onClick={()=>{setMode('casual');reset();}}>Casual</button>
+        <button className={mode==='perfect'?'selected':''} onClick={()=>{setMode('perfect');reset();}}>Perfect</button>
+      </div>
+    </div>
+
+    <div className="tic-board" aria-label="Tic-Tac-Toe board">
       {board.map((v,i)=><motion.button
-        whileHover={{backgroundColor:'rgba(255,255,255,.055)',scale:1.02}}
-        whileTap={{scale:.95}}
-        className={'tic-cell '+(v||'')}
+        whileHover={{backgroundColor:'rgba(255,255,255,.055)',scale:winCells.includes(i)?1.04:1.02}}
+        whileTap={{scale:.94}}
+        className={'tic-cell '+(v||'')+(winCells.includes(i)?' winner':'')}
         onClick={()=>move(i)}
         key={i}
         aria-label={'Tic-Tac-Toe cell '+(i+1)}
-      >{v||''}</motion.button>)}
+        disabled={Boolean(v)||Boolean(w)||thinking}
+      >
+        {v||''}
+      </motion.button>)}
+    </div>
+
+    <div className="tic-underboard">
+      <span>{last||(w==='draw'?'Board locked — clean draw.':w?w+' wins.':thinking?'AI is thinking…':'Your move — try to build a streak.')}</span>
+      <span className="tic-engine">{mode==='perfect'?'Minimax engine':'Adaptive opponent'}</span>
     </div>
 
     <div className="game-actions">
-      <span className="game-status">{last||(w==='draw'?'Draw.':w?w+' wins.':thinking?'AI thinking…':'Your move — build a streak.')}</span>
+      <span className="game-status">{stats.wins+stats.losses+stats.draws} rounds played</span>
       <button className="lab-button" onClick={reset}><RotateCcw size={13}/> Rematch</button>
     </div>
   </div>;
@@ -241,6 +295,7 @@ function Wend(){
   const [score,setScore]=useState(0);
   const [streak,setStreak]=useState(()=>storedNumber('brain-wend-streak'));
   const [best,setBest]=useState(()=>storedNumber('brain-wend-best'));
+  const [mistakes,setMistakes]=useState(0);
   const [usedHint,setUsedHint]=useState<number|null>(null);
   const [dragging,setDragging]=useState(false);
   const usedCells=new Set(history.flat());
@@ -256,6 +311,7 @@ function Wend(){
     setHints(0);
     setUsedHint(null);
     setScore(0);
+    setMistakes(0);
     setDragging(false);
     setStreak(0);
     window.localStorage.setItem('brain-wend-streak','0');
@@ -269,6 +325,8 @@ function Wend(){
 
   const formatTime=(ms:number)=>
     String(Math.floor(ms/60000)).padStart(2,'0')+':'+String(Math.floor(ms/1000)%60).padStart(2,'0');
+  const elapsedSeconds=Math.floor(elapsed/1000);
+  const nextWordIndex=puzzle.words.findIndex(item=>!found.includes(item));
 
   const row=(i:number)=>Math.floor(i/puzzle.size);
   const col=(i:number)=>i%puzzle.size;
@@ -330,12 +388,15 @@ function Wend(){
         return next;
       });
       setMessage('Nice find — keep the streak alive.');
+      if(typeof navigator!=='undefined' && 'vibrate' in navigator) navigator.vibrate?.(18);
       setPath([]);
       return;
     }
 
     setStreak(0);
-    window.localStorage.setItem('brain-wend-streak','0');
+    setMistakes(prev=>prev+1);
+    if(typeof navigator!=='undefined' && 'vibrate' in navigator) navigator.vibrate?.(35);
+    if(typeof window!=='undefined') window.localStorage.setItem('brain-wend-streak','0');
     setMessage(formed+' is not one of the hidden words.');
     setPath([]);
   };
@@ -371,8 +432,9 @@ function Wend(){
     setStarted(null);
     setDragging(false);
     setScore(0);
+    setMistakes(0);
     setStreak(0);
-    window.localStorage.setItem('brain-wend-streak','0');
+    if(typeof window!=='undefined') window.localStorage.setItem('brain-wend-streak','0');
   };
 
   const hint=()=>{
@@ -402,6 +464,13 @@ function Wend(){
       <div><span>Streak</span><strong>{streak} 🔥</strong></div>
       <div><span>Best</span><strong>{best}</strong></div>
       <div><span>Found</span><strong>{found.length}/{puzzle.words.length}</strong></div>
+      <div><span>Mistakes</span><strong>{mistakes}</strong></div>
+    </div>
+
+    <div className="wend-progress">
+      <div className="wend-progress-track"><span style={{width:(found.length/puzzle.words.length*100)+'%'}} /></div>
+      <span>{found.length === puzzle.words.length ? 'Complete' : Math.round(found.length/puzzle.words.length*100)+'% solved'}</span>
+      <span className="wend-puzzle-id">Puzzle {puzzleIndex+1}/{puzzles.length}</span>
     </div>
 
     <div className="wend-help">
@@ -455,9 +524,11 @@ function Wend(){
             {hit&&<Check size={14}/>}
           </div>;
         })}
-        {formed&&<div className="wend-live">Current: <b>{formed}</b></div>}
+        {dragging&&<div className="wend-live"><Timer size={12}/> Selecting <b>{formed||'…'}</b> · {path.length} tile{path.length===1?'':'s'}</div>}
+        {!dragging&&formed&&<div className="wend-live">Current: <b>{formed}</b></div>}
         {message&&<div className="wend-error">{message}</div>}
-        {complete&&<div className="wend-complete">Puzzle complete · {formatTime(elapsed)} · {score} points</div>}
+        {complete&&<div className="wend-complete"><Sparkles size={13}/> Puzzle complete · {formatTime(elapsed)} · {score} points</div>}
+        {!complete&&nextWordIndex>=0&&<div className="wend-next">Next target: <b>{puzzle.lengths[nextWordIndex]} letters</b> · {Math.max(0,60-elapsedSeconds)}s speed bonus window</div>}
       </aside>
     </div>
 
