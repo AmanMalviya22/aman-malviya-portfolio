@@ -1,2 +1,4 @@
 User-agent: *
 Allow: /
+
+Sitemap: https://aman-malviya22.netlify.app/sitemap.xml
