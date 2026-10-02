@@ -1,46 +1,52 @@
-# Astro Starter Kit: Basics
+# Aman Malviya — Portfolio
 
-```sh
-npm create astro@latest -- --template basics
+Personal portfolio for Aman Malviya, a backend-focused software engineer working with Java, Spring Boot, distributed systems, cloud infrastructure, payments, and developer tooling.
+
+## Stack
+
+- Astro
+- React
+- TypeScript
+- Tailwind CSS
+- Motion
+- Lucide React
+
+## Highlights
+
+- Backend engineering experience and production-focused case studies
+- Java / Spring Boot / microservices / AWS / Redis / messaging stack
+- Interactive Brain Lab with:
+  - Tic-Tac-Toe powered by a Minimax AI
+  - Grid Word / Wend with drag-based word paths and local scoring
+- Responsive, dark-first portfolio UI
+- Static site deployment compatible with Netlify
+
+## Local development
+
+```bash
+npm install
+npm run dev
 ```
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+Production build:
 
-## 🚀 Project Structure
-
-Inside of your Astro project, you'll see the following folders and files:
-
-```text
-/
-├── public/
-│   └── favicon.svg
-├── src
-│   ├── assets
-│   │   └── astro.svg
-│   ├── components
-│   │   └── Welcome.astro
-│   ├── layouts
-│   │   └── Layout.astro
-│   └── pages
-│       └── index.astro
-└── package.json
+```bash
+npm run build
+npm run preview
 ```
 
-To learn more about the folder structure of an Astro project, refer to [our guide on project structure](https://docs.astro.build/en/basics/project-structure/).
+## Deployment
 
-## 🧞 Commands
+Netlify is configured through `netlify.toml`:
 
-All commands are run from the root of the project, from a terminal:
+- Build command: `npm run build`
+- Publish directory: `dist`
+- Node: `22.12.0`
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
+When the Netlify site is connected to this GitHub repository and the `main` branch, pushes to `main` can be deployed automatically.
 
-## 👀 Want to learn more?
+## Links
 
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+- Portfolio: https://aman-malviya22.netlify.app
+- GitHub: https://github.com/AmanMalviya22
+- LinkedIn: https://www.linkedin.com/in/aman-malviya22/
