@@ -31,25 +31,31 @@ const skillGroups = [
 
 const projects = [
   {
-    title: 'Payment RCA Copilot',
-    type: 'AI + Backend',
-    text: 'An MCP-powered diagnostic workflow that connects transaction context with operational logs and guides engineers toward faster root-cause analysis.',
-    tags: ['Java','MCP','Claude','SQL'],
-    detail: 'Context → operational data → diagnostics → engineer-ready RCA'
+    title: 'MCP Server — AI-Powered RCA',
+    type: 'Flagship · Internal',
+    company: 'VM Media Private Limited',
+    text: 'An internal MCP server that connected an AI assistant with transaction context, database information, and operational logs to help engineers investigate failures more efficiently.',
+    tags: ['Java','Spring Boot','MCP','Claude','SQL'],
+    detail: 'Transaction context → MCP tools → internal data/logs → structured diagnostic insights',
+    architecture: ['Transaction context','MCP server','Database + logs','Claude → RCA insights']
   },
   {
     title: 'Reference Data Graph',
     type: 'Platform + Data',
+    company: 'Backend engineering',
     text: 'Centralized SWIFT, IFSC, and banking-reference data with fast lookup paths and Redis caching for high-traffic services.',
     tags: ['Java','Redis','AWS','Caching'],
-    detail: 'Reference data → centralized lookup → cache → low-latency access'
+    detail: 'Reference data → centralized lookup → cache → low-latency access',
+    architecture: ['Reference sources','Central data layer','Redis cache','Service lookup']
   },
   {
     title: 'Brain Lab',
     type: 'Interactive Systems',
+    company: 'Portfolio experiment',
     text: 'A client-side React playground featuring a minimax Tic-Tac-Toe opponent and a drag-based grid-word puzzle with local scoring and touch support.',
     tags: ['Astro','React','TypeScript','Algorithms'],
-    detail: 'Interactive UI → client-side state → algorithms → immediate feedback'
+    detail: 'Interactive UI → client-side state → algorithms → immediate feedback',
+    architecture: ['User interaction','React state','Algorithm engine','Immediate feedback']
   }
 ];
 ---
@@ -159,13 +165,31 @@ const projects = [
 
     <section id="projects" class="section alt">
       <div class="container"><div class="wide-heading row-head"><div><p class="label">05 / Projects</p><h2>Selected work & experiments.</h2></div><a class="text-link" href="https://github.com/AmanMalviya22" target="_blank" rel="noreferrer">Browse GitHub ↗</a></div>
-        <div class="project-grid">{projects.map((project, index) => <article class="project"><span class="project-no">0{index + 1}</span><small>{project.type}</small><h3>{project.title}</h3><p>{project.text}</p><div class="tags">{project.tags.map((tag) => <span>{tag}</span>)}</div><div class="project-links">
-  <a href="#contact">Discuss the work ↗</a>
-  <details class="project-more">
-    <summary>View system shape +</summary>
-    <p>{project.detail}</p>
-  </details>
-</div></article>)}</div>
+        <div class="project-grid">
+          {projects.map((project, index) => (
+            <article class={'project '+(index===0?'project-featured':'')}>
+              <span class="project-no">0{index + 1}</span>
+              <small>{project.type}</small>
+              <h3>{project.title}</h3>
+              <p class="project-company">{project.company}</p>
+              <p>{project.text}</p>
+              <div class="tags">{project.tags.map((tag) => <span>{tag}</span>)}</div>
+              {index===0 && <div class="internal-badge">Internal company project · no public demo</div>}
+              <div class="project-links">
+                {index===0
+                  ? <span class="project-note">Architecture and implementation details are intentionally summarized.</span>
+                  : <a href="#contact">Discuss the work ↗</a>}
+                <details class="project-more">
+                  <summary>View system shape +</summary>
+                  <p>{project.detail}</p>
+                  <div class="project-flow">
+                    {project.architecture.map((step, stepIndex) => <span><b>0{stepIndex + 1}</b>{step}</span>)}
+                  </div>
+                </details>
+              </div>
+            </article>
+          ))}
+        </div>
       </div>
     </section>
 
