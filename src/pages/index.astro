@@ -37,7 +37,10 @@ const projects = [
     text: 'An internal MCP server that connected an AI assistant with transaction context, database information, and operational logs to help engineers investigate failures more efficiently.',
     tags: ['Java','Spring Boot','MCP','Claude','SQL'],
     detail: 'Transaction context → MCP tools → internal data/logs → structured diagnostic insights',
-    architecture: ['Transaction context','MCP server','Database + logs','Claude → RCA insights']
+    architecture: ['Transaction context','MCP server','Database + logs','Claude → RCA insights'],
+    problem: 'Production failures could require engineers to move between transaction data, database records, and operational logs during investigation.',
+    approach: 'Built an MCP-based workflow with focused diagnostic tools and connected that context to Claude for structured analysis.',
+    outcome: 'A repeatable AI-assisted investigation workflow that makes failure analysis faster to navigate and easier to reason about.'
   },
   {
     title: 'Reference Data Graph',
@@ -175,6 +178,11 @@ const projects = [
               <p>{project.text}</p>
               <div class="tags">{project.tags.map((tag) => <span>{tag}</span>)}</div>
               {index===0 && <div class="internal-badge">Internal company project · no public demo</div>}
+              {index===0 && <div class="project-story">
+                <div><span>Problem</span><p>{project.problem}</p></div>
+                <div><span>Approach</span><p>{project.approach}</p></div>
+                <div><span>Outcome</span><p>{project.outcome}</p></div>
+              </div>}
               <div class="project-links">
                 {index===0
                   ? <span class="project-note">Architecture and implementation details are intentionally summarized.</span>
