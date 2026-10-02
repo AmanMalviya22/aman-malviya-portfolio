@@ -161,9 +161,11 @@ const projects = [
       <div class="container"><div class="wide-heading row-head"><div><p class="label">05 / Projects</p><h2>Selected work & experiments.</h2></div><a class="text-link" href="https://github.com/AmanMalviya22" target="_blank" rel="noreferrer">Browse GitHub ↗</a></div>
         <div class="project-grid">{projects.map((project, index) => <article class="project"><span class="project-no">0{index + 1}</span><small>{project.type}</small><h3>{project.title}</h3><p>{project.text}</p><div class="tags">{project.tags.map((tag) => <span>{tag}</span>)}</div><div class="project-links">
   <a href="#contact">Discuss the work ↗</a>
-  <button type="button" class="project-more">View system shape +</button>
-</div>
-<div class="project-detail">{project.detail}</div></article>)}</div>
+  <details class="project-more">
+    <summary>View system shape +</summary>
+    <p>{project.detail}</p>
+  </details>
+</div></article>)}</div>
       </div>
     </section>
 
