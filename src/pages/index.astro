@@ -42,14 +42,18 @@ const projects = [
     tags: ['Java','Spring Boot','MCP','Claude API','SQL'],
     problem: 'Investigating transaction failures required engineers to gather relevant transaction context, database records, and operational diagnostics.',
     approach: 'Built focused MCP tools to expose investigation context to Claude for structured root-cause analysis.',
-    outcome: 'Reduced root-cause investigation time by approximately 30%. Internal company work; implementation details are summarized for confidentiality.'
+    outcome: 'Reduced root-cause investigation time by approximately 30%. Internal company work; implementation details are summarized for confidentiality.',
+    workflow: ['Payment failure context', 'Database logs and diagnostics', 'Claude-assisted analysis', 'RCA summary']
   },
   {
     title: 'Banking Reference Data Graph',
     type: 'DATA PLATFORM',
     company: 'NIUM',
     text: 'Migrated SWIFT, IFSC, and bank-code reference data from application code into a centralized graph-based system to simplify configuration and partner onboarding.',
-    tags: ['Java','Reference Data','Microservices','Redis']
+    tags: ['Java','Reference Data','Microservices','Redis'],
+    problem: 'SWIFT, IFSC, and bank-code reference data needed repeated maintenance across application configuration.',
+    approach: 'Moved reference data into a centralized graph-based system.',
+    outcome: 'Reduced configuration complexity and improved partner onboarding.'
   },
   {
     title: 'Word Lookup Dictionary',
@@ -57,6 +61,8 @@ const projects = [
     company: 'Dictionary application',
     text: 'A dictionary application using Trie-based word lookup with O(m) lookup time, where m is the word length.',
     tags: ['Trie Search','Levenshtein Distance','Auto-suggestion','Fuzzy Matching'],
+    source: 'https://github.com/AmanMalviya22/Online-Dictionary',
+    sourceLabel: 'View source code',
     problem: 'Finding words and handling spelling variations requires fast exact lookup and useful suggestions.',
     approach: 'Implemented Trie-based lookup, auto-suggestion, and spell correction using Levenshtein distance with fuzzy matching.',
     outcome: 'Combines efficient exact search with spelling-aware suggestions and correction in one dictionary workflow.'
@@ -107,6 +113,30 @@ const projects = [
       </div>
     </section>
 
+    <section class="impact-section" aria-label="Selected engineering impact">
+      <div class="container impact-grid">
+        <div class="impact-intro">
+          <p class="label">SELECTED IMPACT</p>
+          <p>Production improvements, not just features shipped.</p>
+        </div>
+        <article class="impact-stat">
+          <strong>~15%</strong>
+          <span>Higher payment success</span>
+          <small>Automated validation</small>
+        </article>
+        <article class="impact-stat">
+          <strong>~40%</strong>
+          <span>Less manual intervention</span>
+          <small>Automated validation</small>
+        </article>
+        <article class="impact-stat">
+          <strong>~30%</strong>
+          <span>Faster root-cause investigations</span>
+          <small>Claude-powered MCP tooling</small>
+        </article>
+      </div>
+    </section>
+
     <section id="about" class="section">
       <div class="container split">
         <div><p class="label">01 / ABOUT</p><h2>Practical engineering, built for production.</h2></div>
@@ -152,11 +182,17 @@ const projects = [
             <article class={'project '+(index===0?'project-featured':'')}>
               <div class="project-heading">
                 <small>{project.type}</small>
-                {index===0 && <span class="internal-badge">Internal · no public demo</span>}
+                {!project.source && <span class="internal-badge">Internal · no public demo</span>}
               </div>
               <h3>{project.title}</h3>
               <p class="project-company">{project.company}</p>
               <p class="project-description">{project.text}</p>
+              {project.workflow && <div class="workflow">
+                <p class="workflow-label">HIGH-LEVEL WORKFLOW · CONFIDENTIALITY-SAFE OVERVIEW</p>
+                <div class="workflow-steps" aria-label="Conceptual root-cause analysis workflow">
+                  {project.workflow.map((step, stepIndex) => <div class="workflow-step"><span>{String(stepIndex + 1).padStart(2, '0')}</span><strong>{step}</strong></div>)}
+                </div>
+              </div>}
               <div class="tags">{project.tags.map((tag) => <span>{tag}</span>)}</div>
               {project.problem && <div class="project-story">
                 <div><span>Problem</span><p>{project.problem}</p></div>
@@ -164,7 +200,8 @@ const projects = [
                 <div><span>Outcome</span><p>{project.outcome}</p></div>
               </div>}
               <div class="project-links">
-                {index===0 && <span class="project-note">Internal project; implementation details are summarized for confidentiality.</span>}
+                {!project.source && <span class="project-note">Internal case study; details are summarized for confidentiality.</span>}
+                {project.source && <a href={project.source} target="_blank" rel="noreferrer">{project.sourceLabel} <span aria-hidden="true">↗</span></a>}
                 <a href="#contact">Discuss this work <span aria-hidden="true">↗</span></a>
               </div>
             </article>
