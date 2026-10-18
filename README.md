@@ -1,25 +1,20 @@
 # Aman Malviya — Portfolio
 
-Personal portfolio for Aman Malviya, a backend-focused software engineer working with Java, Spring Boot, distributed systems, cloud infrastructure, payments, and developer tooling.
+A clean, backend-focused portfolio highlighting software engineering experience, production impact, technical strengths, and selected backend projects.
 
-## Stack
+## Built with
 
 - Astro
-- React
 - TypeScript
 - Tailwind CSS
-- Motion
-- Lucide React
 
 ## Highlights
 
-- Backend engineering experience and production-focused case studies
-- Java / Spring Boot / microservices / AWS / Redis / messaging stack
-- Interactive Brain Lab with:
-  - Tic-Tac-Toe powered by a Minimax AI
-  - Grid Word / Wend with drag-based word paths and local scoring
-- Responsive, dark-first portfolio UI
-- Static site deployment compatible with Netlify
+- Recruiter-focused introduction for Java backend engineering roles
+- Production experience across payment services, cloud infrastructure, caching, and messaging
+- Flagship internal case study: MCP Server — AI-Powered Root Cause Analysis
+- Backend project on banking reference data and Redis caching
+- Responsive layouts, keyboard accessibility, custom 404 page, and search metadata
 
 ## Local development
 
@@ -28,7 +23,7 @@ npm install
 npm run dev
 ```
 
-Production build:
+Build and preview the production site:
 
 ```bash
 npm run build
@@ -43,7 +38,7 @@ Netlify is configured through `netlify.toml`:
 - Publish directory: `dist`
 - Node: `22.12.0`
 
-When the Netlify site is connected to this GitHub repository and the `main` branch, pushes to `main` can be deployed automatically.
+Connect the Netlify site to this GitHub repository and the `main` branch to deploy updates automatically.
 
 ## Links
 
