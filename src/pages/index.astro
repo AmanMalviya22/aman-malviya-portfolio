@@ -75,43 +75,38 @@ const projects = [
       <div class="hero-grid"></div><div class="hero-glow glow-a"></div><div class="hero-glow glow-b"></div>
       <div class="container hero-inner">
         <div class="hero-copy">
-          <div class="eyebrow"><span class="status"></span> Open to backend engineering opportunities · Immediate joiner</div>
-          <p class="kicker">Backend Engineer · Java · Spring Boot · AWS</p>
-          <h1>Building reliable backend systems with <span>Java, Spring Boot & distributed systems.</span></h1>
-          <p class="hero-text">Backend engineer with ~2 years of software development experience across payment platforms, cloud-native services, caching, messaging, and AI-assisted operational tooling.</p>
-          <div class="actions"><a class="btn primary" href="#projects">See flagship system ↓</a><a class="btn secondary" href="https://www.linkedin.com/in/aman-malviya22/" target="_blank" rel="noreferrer">LinkedIn ↗</a></div>
-          <div class="proof"><div><b>~2 yrs</b><small>software development</small></div><div><b>5K+</b><small>daily transactions</small></div><div><b>99.9%+</b><small>production uptime</small></div></div>
+          <p class="eyebrow"><span class="status"></span> Available for backend roles <span class="eyebrow-divider">·</span> Immediate joiner</p>
+          <p class="kicker">BACKEND ENGINEER / JAVA · SPRING BOOT · AWS</p>
+          <h1>I build reliable backend systems with <span>Java and Spring Boot.</span></h1>
+          <p class="hero-text">Around 2 years of software development experience across payment services, cloud-native microservices, data platforms, and AI-assisted diagnostics.</p>
+          <div class="actions"><a class="btn primary" href="#projects">View selected work <span aria-hidden="true">↘</span></a><a class="btn secondary" href="https://www.linkedin.com/in/aman-malviya22/" target="_blank" rel="noreferrer">Connect on LinkedIn <span aria-hidden="true">↗</span></a></div>
         </div>
-        <div class="terminal">
-          <div class="terminal-head"><span class="lights"><i></i><i></i><i></i></span><span>aman@portfolio ~ /backend</span></div>
-          <div class="terminal-body">
-            <p><em>$</em> whoami</p><h3>Aman Malviya</h3>
-            <p><em>$</em> stack --core</p>
-            <div class="chip-row"><span>Java</span><span>Spring Boot</span><span>AWS</span><span>Redis</span><span>Docker</span><span>K8s</span></div>
-            <p><em>$</em> mission</p><blockquote>Build systems people can trust when traffic, latency, and failures arrive together.</blockquote>
-            <p class="cursor"><em>→</em> _</p>
+        <aside class="hero-panel" aria-label="Backend engineering highlights">
+          <p class="panel-label">BACKEND ENGINEERING</p>
+          <h2>Built for real-world systems.</h2>
+          <p class="panel-copy">Payment processing, distributed services, data access, and operational reliability.</p>
+          <div class="stack-list"><span>Java</span><span>Spring Boot</span><span>Microservices</span><span>AWS</span><span>Redis</span><span>SQL</span><span>Docker</span><span>Kubernetes</span></div>
+          <div class="panel-divider"></div>
+          <div class="hero-metrics">
+            <div><strong>5K+</strong><span>daily transactions</span></div>
+            <div><strong>50+</strong><span>banking partners</span></div>
+            <div><strong>99.9%+</strong><span>uptime</span></div>
           </div>
-        </div>
-      </div>
-      <div class="container scroll-hint"><span>Scroll to explore</span><i></i></div>
+        </aside>      <div class="container scroll-hint"><span>Scroll to explore</span><i></i></div>
     </section>
 
     <section id="about" class="section">
       <div class="container split">
-        <div><p class="label">01 / About</p><h2>Engineering with a systems mindset.</h2></div>
-        <div><p class="lead">I like turning messy backend problems into clear, testable systems — from payment flows and data lookups to observability and AI-assisted debugging.</p>
-          <div class="about-grid">
-            <article><b>01</b><h3>Backend first</h3><p>Java, Spring Boot, REST, data access, concurrency, messaging, and production debugging.</p></article>
-            <article><b>02</b><h3>Reliability minded</h3><p>Timeouts, caching, failure handling, monitoring, and deployment are part of the feature.</p></article>
-            <article><b>03</b><h3>AI curious</h3><p>MCP and Claude experiments aimed at making operational workflows faster and more explainable.</p></article>
-            <article><b>04</b><h3>Clear execution</h3><p>Readable code, defined boundaries, and practical trade-offs over unnecessary complexity.</p></article>
-          </div>
+        <div><p class="label">01 / ABOUT</p><h2>Practical engineering, built for production.</h2></div>
+        <div class="about-copy"><p class="lead">I work on backend services where correctness, latency, and reliability matter. My experience spans fintech payment flows, reference data, AWS-based microservices, and AI-assisted root-cause analysis.</p>
+          <p class="about-detail">I value simple APIs, clear service boundaries, useful observability, and code that is easy for another engineer to maintain.</p>
+          <div class="about-tags"><span>Backend APIs</span><span>Distributed systems</span><span>Production reliability</span><span>AI-assisted tooling</span></div>
         </div>
       </div>
     </section>
 
     <section id="experience" class="section alt">
-      <div class="container"><div class="wide-heading"><p class="label">02 / Experience</p><h2>Production systems, not tutorial projects.</h2><p>Backend engineering, fintech workflows, deployment, and operational tooling.</p></div>
+      <div class="container"><div class="wide-heading"><p class="label">02 / EXPERIENCE</p><h2>Experience in production environments.</h2><p>Backend development across fintech, data platforms, and infrastructure.</p></div>
         <div class="timeline">
           {experience.map((job) => <article class="timeline-item">
             <div class="rail"><span></span></div>
@@ -119,12 +114,6 @@ const projects = [
               <div class="meta"><span>{job.period}</span><span>{job.place}</span></div>
               <h3>{job.role}</h3>
               <p class="company">{job.company}</p>
-              {job.company === 'NIUM' && <div class="impact-strip">
-                <div><strong>5K+</strong><span>daily transactions</span></div>
-                <div><strong>50+</strong><span>banking partners</span></div>
-                <div><strong>99.9%+</strong><span>uptime</span></div>
-                <div><strong>~15%</strong><span>success-rate lift</span></div>
-              </div>}
               <ul>{job.bullets.map((bullet) => <li>{bullet}</li>)}</ul>
             </div>
           </article>)}
@@ -134,24 +123,12 @@ const projects = [
 
     <section id="skills" class="section">
       <div class="container">
-        <div class="wide-heading"><p class="label">03 / Stack</p><h2>Tools I reach for when the system matters.</h2><p>A backend-first stack organized by the problems each layer solves.</p></div>
+        <div class="wide-heading"><p class="label">03 / SKILLS</p><h2>A focused backend stack.</h2><p>Core technologies I use to build, ship, and operate backend services.</p></div>
         <div class="skill-groups">
           {skillGroups.map((group) => <article class="skill-group">
             <h3>{group.title}</h3>
             <div class="skills-wrap">{group.items.map((skill) => <span class="skill">{skill}</span>)}</div>
           </article>)}
-        </div>
-      </div>
-    </section>
-
-    <section id="approach" class="section alt approach">
-      <div class="container">
-        <div class="wide-heading"><p class="label">04 / Engineering approach</p><h2>How I think about backend systems.</h2><p>From API contracts to production feedback, I treat reliability as part of the design.</p></div>
-        <div class="approach-grid">
-          <article><span>01</span><h3>Design the contract</h3><p>Clear APIs, data models, boundaries, and failure cases before implementation.</p></article>
-          <article><span>02</span><h3>Control the load</h3><p>Use caching, queues, connection management, and concurrency deliberately.</p></article>
-          <article><span>03</span><h3>Plan for failure</h3><p>Timeouts, retries, idempotency, and graceful degradation belong in the feature.</p></article>
-          <article><span>04</span><h3>Observe the system</h3><p>Logs, metrics, diagnostics, and feedback loops turn production behavior into signals.</p></article>
         </div>
       </div>
     </section>
@@ -192,9 +169,9 @@ const projects = [
     </section>
 
     <section id="contact" class="section contact">
-      <div class="container contact-card"><div><p class="label">06 / Contact</p><h2>Let's build something useful.</h2><p>For backend engineering roles, technical conversations, or interesting engineering problems.</p></div><div class="actions"><a class="btn primary" href="https://www.linkedin.com/in/aman-malviya22/" target="_blank" rel="noreferrer">Connect on LinkedIn ↗</a><a class="btn secondary" href="https://github.com/AmanMalviya22" target="_blank" rel="noreferrer">Open GitHub ↗</a></div></div>
+      <div class="container contact-card"><div><p class="label">05 / CONTACT</p><h2>Let's build something useful.</h2><p>For backend engineering roles, technical conversations, or interesting engineering problems.</p></div><div class="actions"><a class="btn primary" href="https://www.linkedin.com/in/aman-malviya22/" target="_blank" rel="noreferrer">Connect on LinkedIn ↗</a><a class="btn secondary" href="https://github.com/AmanMalviya22" target="_blank" rel="noreferrer">Open GitHub ↗</a></div></div>
     </section>
   </main>
 
-  <footer class="footer"><div class="container footer-inner"><span>© 2026 Aman Malviya</span><span>Astro + React + TypeScript</span><a href="#top">Back to top ↑</a></div></footer>
+  <footer class="footer"><div class="container footer-inner"><span>© 2026 Aman Malviya</span><span>Astro · TypeScript · Tailwind CSS</span><a href="#top">Back to top ↑</a></div></footer>
 </Layout>
