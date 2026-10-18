@@ -4,47 +4,62 @@ import Layout from '../layouts/Layout.astro';
 
 const experience = [
   { period: 'Aug 2025 — Sep 2026', company: 'NIUM', role: 'Software Development Engineer I', place: 'Mumbai', bullets: [
-    'Built Java/Spring Boot payment services handling 5K+ daily transactions across 50+ banking partners.',
+    'Built real-time Java/Spring Boot payment systems processing 5K+ daily transactions across 50+ banking partners with 99.99%+ uptime.',
     'Improved payment success rates by ~15% and reduced manual intervention by ~40% through automated validation.',
-    'Built an MCP + Claude workflow for transaction-failure root-cause analysis and operational diagnostics.',
-    'Used Redis caching, AWS EKS, CI/CD, monitoring, and automated scaling for production microservices.'
+    'Built a Claude-powered MCP server for transaction-failure root-cause analysis using database logs and diagnostics, reducing investigation time by ~30%.',
+    'Migrated SWIFT, IFSC, and bank-code reference data into a centralized graph-based system, reducing configuration complexity and improving partner onboarding.',
+    'Added Redis caching to high-traffic lookups and operated AWS EKS microservices with automated scaling, CI/CD, and monitoring.'
   ]},
-  { period: 'Apr 2025 — Aug 2025', company: 'Blacklight Studio', role: 'Associate Backend Developer', place: 'Remote', bullets: [
-    'Built and debugged backend features using Java, REST APIs, SQL, and object-oriented design.',
-    'Worked across development and delivery workflows to ship maintainable application changes.'
+  { period: 'Apr 2025 — Aug 2025', company: 'Blacklight Studio', role: 'Associate Backend Developer', place: 'Noida', bullets: [
+    'Built Java/Spring Boot backend services to improve platform scalability and modularity.',
+    'Designed REST APIs and caching strategies that reduced average response time from ~200 ms to 50 ms (75%).',
+    'Optimized database queries and implemented connection pooling to handle concurrent load with low latency.',
+    'Collaborated with cross-functional teams to ship production features and maintain service reliability.'
   ]},
-  { period: 'Oct 2024 — Feb 2025', company: 'Inorg / VivaOps', role: 'Associate DevOps Engineer', place: 'Remote', bullets: [
-    'Worked with CI/CD, containers, cloud deployment concepts, and operational troubleshooting.',
-    'Improved engineering workflows through automation and deployment support.'
+  { period: 'Oct 2024 — Feb 2025', company: 'Inorg (VivaOps)', role: 'Software Engineer', place: 'Pune', bullets: [
+    'Built backend services and microservices with Java and Spring Boot for internal applications.',
+    'Implemented Jenkins CI/CD pipelines, reducing manual deployment effort by ~70%.',
+    'Managed AWS EC2, S3, RDS, and VPC with auto-scaling; used Terraform and Ansible to reduce deployment time from ~45 minutes to 5 minutes.',
+    'Containerized applications with Docker and orchestrated them on Kubernetes.'
   ]}
 ];
 
 const skillGroups = [
-  { title: 'Backend', items: ['Java','Spring Boot','Spring Data JPA','Hibernate','Microservices','REST APIs'] },
-  { title: 'Data', items: ['SQL','MySQL','PostgreSQL','MongoDB','Redis'] },
-  { title: 'Cloud & DevOps', items: ['AWS','EKS','Docker','Kubernetes','Jenkins','Terraform'] },
-  { title: 'Messaging', items: ['SQS','RabbitMQ'] },
-  { title: 'Engineering', items: ['Distributed Systems','System Design','Multithreading','Concurrency','Git'] },
-  { title: 'AI Tooling', items: ['MCP','Claude'] }
+  { title: 'Languages', items: ['Java','SQL','C++','JavaScript'] },
+  { title: 'Java & APIs', items: ['Spring Boot','Spring Framework','Spring Data JPA','Hibernate','Spring Cloud','Microservices','REST APIs'] },
+  { title: 'Data & Messaging', items: ['MySQL','PostgreSQL','MongoDB','Redis','Amazon SQS','RabbitMQ','Event-Driven Architecture'] },
+  { title: 'Cloud & DevOps', items: ['AWS','EKS','EC2','RDS','S3','VPC','Docker','Kubernetes','Jenkins','CI/CD','Terraform','Ansible'] },
+  { title: 'Engineering', items: ['Multithreading','Concurrency','OOP','System Design','Agile/Scrum'] },
+  { title: 'Tools & AI', items: ['Git','Maven','Gradle','IntelliJ IDEA','Postman','CloudWatch','Claude API','MCP','Prompt Engineering'] }
 ];
 
 const projects = [
   {
-    title: 'MCP Server — AI-Powered RCA',
-    type: 'FLAGSHIP PROJECT',
-    company: 'VM Media Private Limited',
-    text: 'An internal MCP server that connected an AI assistant with transaction context, database information, and operational logs to help engineers investigate failures more efficiently.',
-    tags: ['Java','Spring Boot','MCP','Claude','SQL'],
-    problem: 'Production failures could require engineers to move between transaction data, database records, and operational logs during investigation.',
-    approach: 'Built an MCP-based workflow with focused diagnostic tools and connected that context to Claude for structured analysis.',
-    outcome: 'A repeatable AI-assisted investigation workflow that makes failure analysis faster to navigate and easier to reason about.'
+    title: 'MCP Server — AI-Powered Root-Cause Analysis',
+    type: 'FLAGSHIP CASE STUDY',
+    company: 'NIUM',
+    text: 'A Claude-powered MCP server that connected transaction context with database logs and diagnostics to help engineers investigate payment failures.',
+    tags: ['Java','Spring Boot','MCP','Claude API','SQL'],
+    problem: 'Investigating transaction failures required engineers to gather relevant transaction context, database records, and operational diagnostics.',
+    approach: 'Built focused MCP tools to expose investigation context to Claude for structured root-cause analysis.',
+    outcome: 'Reduced root-cause investigation time by approximately 30%. Internal company work; implementation details are summarized for confidentiality.'
   },
   {
-    title: 'Reference Data Graph',
-    type: 'Platform + Data',
-    company: 'Backend engineering',
-    text: 'Centralized SWIFT, IFSC, and banking-reference data with fast lookup paths and Redis caching for high-traffic services.',
-    tags: ['Java','Redis','AWS','Caching'],
+    title: 'Banking Reference Data Graph',
+    type: 'DATA PLATFORM',
+    company: 'NIUM',
+    text: 'Migrated SWIFT, IFSC, and bank-code reference data from application code into a centralized graph-based system to simplify configuration and partner onboarding.',
+    tags: ['Java','Reference Data','Microservices','Redis']
+  },
+  {
+    title: 'Word Lookup Dictionary',
+    type: 'ALGORITHMIC PROJECT',
+    company: 'Dictionary application',
+    text: 'A dictionary application using Trie-based word lookup with O(m) lookup time, where m is the word length.',
+    tags: ['Trie Search','Levenshtein Distance','Auto-suggestion','Fuzzy Matching'],
+    problem: 'Finding words and handling spelling variations requires fast exact lookup and useful suggestions.',
+    approach: 'Implemented Trie-based lookup, auto-suggestion, and spell correction using Levenshtein distance with fuzzy matching.',
+    outcome: 'Supports efficient word lookup and spelling-aware suggestions without a public demo link listed in the resume.'
   }
 ];
 ---
@@ -54,7 +69,7 @@ const projects = [
     <div class="container nav-inner">
       <a class="brand" href="#top"><span class="brand-mark">AM</span><span>Aman Malviya</span></a>
       <nav class="nav-links" aria-label="Primary navigation">
-        <a href="#about">About</a><a href="#experience">Experience</a><a href="#skills">Skills</a><a href="#projects">Projects</a><a href="#contact">Contact</a>
+        <a href="#about">About</a><a href="#experience">Experience</a><a href="#skills">Skills</a><a href="#projects">Projects</a><a href="#education">Education</a><a href="#contact">Contact</a>
       </nav>
       <details class="mobile-nav">
         <summary>Menu</summary>
@@ -86,7 +101,7 @@ const projects = [
           <div class="hero-metrics">
             <div><strong>5K+</strong><span>daily transactions</span></div>
             <div><strong>50+</strong><span>banking partners</span></div>
-            <div><strong>99.9%+</strong><span>uptime</span></div>
+            <div><strong>99.99%+</strong><span>uptime</span></div>
           </div>
         </aside>
       </div>
@@ -143,14 +158,14 @@ const projects = [
               <p class="project-company">{project.company}</p>
               <p class="project-description">{project.text}</p>
               <div class="tags">{project.tags.map((tag) => <span>{tag}</span>)}</div>
-              {index===0 && <div class="project-story">
+              {project.problem && <div class="project-story">
                 <div><span>Problem</span><p>{project.problem}</p></div>
                 <div><span>Approach</span><p>{project.approach}</p></div>
                 <div><span>Outcome</span><p>{project.outcome}</p></div>
               </div>}
               <div class="project-links">
-                {index===0 && <span class="project-note">Technical details are summarized to respect confidentiality.</span>}
-                <a href="#contact">{index===0 ? 'Discuss this project' : 'Discuss the work'} <span aria-hidden="true">↗</span></a>
+                {index===0 && <span class="project-note">Internal project; implementation details are summarized for confidentiality.</span>}
+                <a href="#contact">Discuss this work <span aria-hidden="true">↗</span></a>
               </div>
             </article>
           ))}
@@ -158,8 +173,27 @@ const projects = [
       </div>
     </section>
 
+    <section id="education" class="section">
+      <div class="container">
+        <div class="wide-heading"><p class="label">05 / EDUCATION & RECOGNITION</p><h2>Education and competitive programming.</h2></div>
+        <div class="credentials-grid">
+          <article class="credential-card">
+            <p class="credential-type">EDUCATION</p>
+            <h3>B.Tech in Computer Science</h3>
+            <p>Shri Mata Vaishno Devi University</p>
+            <span>2020 – 2024</span>
+          </article>
+          <article class="credential-card">
+            <p class="credential-type">ACHIEVEMENT</p>
+            <h3>CodeChef · 4-star</h3>
+            <p>1654 points · Global Rank 2 in the November Long 2022 contest, Division 3 (Rated).</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
     <section id="contact" class="section contact">
-      <div class="container contact-card"><div><p class="label">05 / CONTACT</p><h2>Let's build something useful.</h2><p>For backend engineering roles, technical conversations, or interesting engineering problems.</p></div><div class="contact-actions"><a class="btn primary" href="https://www.linkedin.com/in/aman-malviya22/" target="_blank" rel="noopener noreferrer">Connect on LinkedIn <span aria-hidden="true">↗</span></a><a class="btn secondary" href="https://drive.google.com/file/d/1wRYMGjQWHrUZlEtc-pSA1JUpv5ju4C1u/view" target="_blank" rel="noopener noreferrer">View resume <span aria-hidden="true">↗</span></a><a class="contact-github" href="https://drive.google.com/uc?export=download&amp;id=1wRYMGjQWHrUZlEtc-pSA1JUpv5ju4C1u" target="_blank" rel="noopener noreferrer">Download resume ↓</a><a class="contact-github" href="https://github.com/AmanMalviya22" target="_blank" rel="noopener noreferrer">GitHub profile ↗</a></div></div>
+      <div class="container contact-card"><div><p class="label">06 / CONTACT</p><h2>Let's build something useful.</h2><p>For backend engineering roles, technical conversations, or interesting engineering problems.</p><div class="contact-details"><a href="mailto:amanaman26802@gmail.com">amanaman26802@gmail.com</a><a href="tel:+919149736306">+91 91497 36306</a></div></div><div class="contact-actions"><a class="btn primary" href="https://www.linkedin.com/in/aman-malviya22/" target="_blank" rel="noopener noreferrer">Connect on LinkedIn <span aria-hidden="true">↗</span></a><a class="btn secondary" href="https://drive.google.com/file/d/1wRYMGjQWHrUZlEtc-pSA1JUpv5ju4C1u/view" target="_blank" rel="noopener noreferrer">View resume <span aria-hidden="true">↗</span></a><a class="contact-github" href="https://drive.google.com/uc?export=download&amp;id=1wRYMGjQWHrUZlEtc-pSA1JUpv5ju4C1u" target="_blank" rel="noopener noreferrer">Download resume ↓</a><a class="contact-github" href="https://github.com/AmanMalviya22" target="_blank" rel="noopener noreferrer">GitHub profile ↗</a></div></div>
     </section>
   </main>
 
