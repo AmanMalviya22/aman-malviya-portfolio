@@ -3,34 +3,32 @@ import '../styles/global.css';
 import Layout from '../layouts/Layout.astro';
 
 const experience = [
-  { period: 'Aug 2025 — Sep 2026', company: 'NIUM', role: 'Software Development Engineer I', place: 'Mumbai', bullets: [
-    'Built real-time Java/Spring Boot payment systems processing 5K+ daily transactions across 50+ banking partners with 99.99%+ uptime.',
-    'Improved payment success rates by ~15% and reduced manual intervention by ~40% through automated validation.',
-    'Built a Claude-powered MCP server for transaction-failure root-cause analysis using database logs and diagnostics, reducing investigation time by ~30%.',
-    'Migrated SWIFT, IFSC, and bank-code reference data into a centralized graph-based system, reducing configuration complexity and improving partner onboarding.',
-    'Added Redis caching to high-traffic lookups and operated AWS EKS microservices with automated scaling, CI/CD, and monitoring.'
+  { period: 'Aug 2025 — Sep 2026', company: 'NIUM', role: 'Software Development Engineer I', place: 'Mumbai, India', bullets: [
+    'Engineered core payment microservices with Java 17, Spring Boot, and AWS EKS (Kubernetes), orchestrating 100K+ daily transactions across 50+ global banking partners while maintaining 99.99%+ availability.',
+    'Automated payment-validation pre-checks and routing rules, boosting transaction success rates by 15% and reducing manual operational intervention by 40%.',
+    'Engineered fault-tolerant messaging using Amazon SQS redrive policies (maxReceiveCount tuned from 5 to 1) and Dead Letter Queue (DLQ) isolation, eliminating 80% of unproductive retry cycles.',
+    'Built a Claude-powered Model Context Protocol (MCP) server unifying Grafana logs, DB diagnostics, and Bitbucket context, reducing production root-cause investigation time by 30%.',
+    'Migrated banking partner reference data into a centralized Amazon Neptune (graph database) backed by Redis caching, simplifying partner onboarding and accelerating high-traffic routing lookups.'
   ]},
-  { period: 'Apr 2025 — Aug 2025', company: 'Blacklight Studio', role: 'Associate Backend Developer', place: 'Noida', bullets: [
-    'Built Java/Spring Boot backend services to improve platform scalability and modularity.',
-    'Designed REST APIs and caching strategies that reduced average response time from ~200 ms to 50 ms (75%).',
-    'Optimized database queries and implemented connection pooling to handle concurrent load with low latency.',
-    'Collaborated with cross-functional teams to ship production features and maintain service reliability.'
+  { period: 'Apr 2025 — Aug 2025', company: 'Blacklight Studio', role: 'Associate Backend Developer (Contract)', place: 'Noida, India', bullets: [
+    'Developed modular backend microservices and low-latency RESTful APIs using Java, Spring Boot, and Spring Data JPA (Hibernate) to power high-throughput core platform workflows.',
+    'Redesigned API response serialization and implemented distributed Redis caching, reducing average API response latency from 200 ms to 50 ms (75% reduction).',
+    'Optimized complex PostgreSQL/MySQL queries, composite indexing, and HikariCP connection pools; authored comprehensive unit/integration test suites using JUnit 5 and Mockito.'
   ]},
-  { period: 'Oct 2024 — Feb 2025', company: 'Inorg (VivaOps)', role: 'Software Engineer', place: 'Pune', bullets: [
-    'Built backend services and microservices with Java and Spring Boot for internal applications.',
-    'Implemented Jenkins CI/CD pipelines, reducing manual deployment effort by ~70%.',
-    'Managed AWS EC2, S3, RDS, and VPC with auto-scaling; used Terraform and Ansible to reduce deployment time from ~45 minutes to 5 minutes.',
-    'Containerized applications with Docker and orchestrated them on Kubernetes.'
+  { period: 'Oct 2024 — Feb 2025', company: 'Inorg (VivaOps)', role: 'Software Engineer (Internship)', place: 'Pune, India', bullets: [
+    'Developed backend microservices using Java and Spring Boot, containerizing applications with Docker for orchestrated deployment on Kubernetes.',
+    'Implemented automated Jenkins CI/CD pipelines integrated with Git webhooks and automated testing gates, reducing manual build and deployment effort by 70%.',
+    'Provisioned cloud infrastructure across AWS (EC2, S3, RDS, VPC) using Terraform and Ansible, cutting environment setup time from 45 minutes to 5 minutes (89% reduction).'
   ]}
 ];
 
 const skillGroups = [
-  { title: 'Languages', items: ['Java','SQL','C++','JavaScript'] },
-  { title: 'Java & APIs', items: ['Spring Boot','Spring Framework','Spring Data JPA','Hibernate','Spring Cloud','Microservices','REST APIs'] },
-  { title: 'Data & Messaging', items: ['MySQL','PostgreSQL','MongoDB','Redis','Amazon SQS','RabbitMQ','Event-Driven Architecture'] },
-  { title: 'Cloud & DevOps', items: ['AWS','EKS','EC2','RDS','S3','VPC','Docker','Kubernetes','Jenkins','CI/CD','Terraform','Ansible'] },
-  { title: 'Engineering', items: ['Multithreading','Concurrency','OOP','System Design','Agile/Scrum'] },
-  { title: 'Tools & AI', items: ['Git','Maven','Gradle','IntelliJ IDEA','Postman','CloudWatch','Claude API','MCP','Prompt Engineering'] }
+  { title: 'Languages & Core', items: ['Java (17, 11, 8)','SQL','C++','JavaScript','Bash','RESTful APIs','Multithreading','Concurrency','OOP'] },
+  { title: 'Backend & Frameworks', items: ['Spring Boot','Spring MVC','Spring Data JPA','Hibernate','Spring Cloud','Spring Security','Microservices'] },
+  { title: 'Databases & Messaging', items: ['PostgreSQL','MySQL','Amazon Neptune','MongoDB','Redis','Apache Kafka','Amazon SQS','RabbitMQ'] },
+  { title: 'Cloud & DevOps', items: ['AWS (EKS, EC2, RDS, S3, VPC, SQS, CloudWatch)','Docker','Kubernetes','Jenkins','CI/CD','Terraform','Linux'] },
+  { title: 'Testing & Developer Tools', items: ['JUnit 5','Mockito','Git','Bitbucket','Maven','Gradle','Postman','Grafana','IntelliJ IDEA'] },
+  { title: 'AI Engineering & Methods', items: ['Claude API','Model Context Protocol (MCP)','LLM Integration','Prompt Engineering','Agile/Scrum'] }
 ];
 
 const projects = [
@@ -38,34 +36,34 @@ const projects = [
     title: 'MCP Server — AI-Powered Root-Cause Analysis',
     type: 'FLAGSHIP CASE STUDY',
     company: 'NIUM',
-    text: 'A Claude-powered MCP server that connected transaction context with database logs and diagnostics to help engineers investigate payment failures.',
+    text: 'A Claude-powered MCP server unifying Grafana logs, DB diagnostics, and Bitbucket context to help engineers investigate payment failures.',
     tags: ['Java','Spring Boot','MCP','Claude API','SQL'],
-    problem: 'Investigating transaction failures required engineers to gather relevant transaction context, database records, and operational diagnostics.',
+    problem: 'Investigating transaction failures required engineers to manually gather relevant transaction context, logs, and DB records.',
     approach: 'Built focused MCP tools to expose investigation context to Claude for structured root-cause analysis.',
-    outcome: 'Reduced root-cause investigation time by approximately 30%. Internal company work; implementation details are summarized for confidentiality.',
+    outcome: 'Reduced production root-cause investigation time by 30%. Internal company work; details are summarized for confidentiality.',
     workflow: ['Payment failure context', 'Database logs and diagnostics', 'Claude-assisted analysis', 'RCA summary']
   },
   {
     title: 'Banking Reference Data Graph',
     type: 'DATA PLATFORM',
     company: 'NIUM',
-    text: 'Migrated SWIFT, IFSC, and bank-code reference data from application code into a centralized graph-based system to simplify configuration and partner onboarding.',
-    tags: ['Java','Reference Data','Microservices','Redis'],
-    problem: 'SWIFT, IFSC, and bank-code reference data needed repeated maintenance across application configuration.',
-    approach: 'Moved reference data into a centralized graph-based system.',
-    outcome: 'Reduced configuration complexity and improved partner onboarding.'
+    text: 'Migrated banking partner reference data into a centralized Amazon Neptune (graph database) backed by Redis caching.',
+    tags: ['Java','Amazon Neptune','Microservices','Redis'],
+    problem: 'SWIFT, IFSC, and bank-code reference data needed repeated maintenance across application configuration and high-traffic lookups.',
+    approach: 'Moved reference data into Amazon Neptune with distributed Redis caching.',
+    outcome: 'Simplified partner onboarding and accelerated high-traffic routing lookups.'
   },
   {
-    title: 'Word Lookup Dictionary',
-    type: 'ALGORITHMIC PROJECT',
-    company: 'Dictionary application',
-    text: 'A dictionary application using Trie-based word lookup with O(m) lookup time, where m is the word length.',
-    tags: ['Trie Search','Levenshtein Distance','Auto-suggestion','Fuzzy Matching'],
-    source: 'https://github.com/AmanMalviya22/Online-Dictionary',
-    sourceLabel: 'View source code',
-    problem: 'Finding words and handling spelling variations requires fast exact lookup and useful suggestions.',
-    approach: 'Implemented Trie-based lookup, auto-suggestion, and spell correction using Levenshtein distance with fuzzy matching.',
-    outcome: 'Combines efficient exact search with spelling-aware suggestions and correction in one dictionary workflow.'
+    title: 'SlotMind – AI Appointment Engine',
+    type: 'EVENT-DRIVEN ARCHITECTURE',
+    company: 'Hackathon Project',
+    text: 'An AI-powered event-driven appointment re-scheduling engine using Java 17, Spring Boot, Kafka, and Redis.',
+    tags: ['Java 17','Spring Boot 3','Apache Kafka','Redis','PostgreSQL','LLM'],
+    source: '#',
+    sourceLabel: 'GitHub Repo',
+    problem: 'Handling schedule recovery when providers go offline required an automated way to manage complete appointment and slot lifecycles without double-booking.',
+    approach: 'Designed a Strategy Pattern engine combining nearest-slot heuristics with LLM recommendations, utilizing asynchronous Kafka event processing and PostgreSQL pessimistic locking.',
+    outcome: 'Cleared Zycus Hackathon Evaluation, eliminating race-condition double-booking.'
   }
 ];
 ---
@@ -91,10 +89,10 @@ const projects = [
     <section class="hero">
       <div class="container hero-inner">
         <div class="hero-copy">
-          <p class="eyebrow"><span class="status"></span> Bengaluru, India <span class="eyebrow-divider">·</span> Available for backend roles <span class="eyebrow-divider">·</span> Immediate joiner</p>
-          <p class="kicker">BACKEND ENGINEER / JAVA · SPRING BOOT · AWS</p>
+          <p class="eyebrow"><span class="status"></span> Mumbai (Open to Relocate) <span class="eyebrow-divider">·</span> Available for backend roles <span class="eyebrow-divider">·</span> Immediate joiner</p>
+          <p class="kicker">SOFTWARE ENGINEER / JAVA · SPRING BOOT · KAFKA · AWS</p>
           <h1>I build reliable backend systems with <span>Java and Spring Boot.</span></h1>
-          <p class="hero-text">Around 2 years of software development experience across payment services, cloud-native microservices, data platforms, and AI-assisted diagnostics.</p>
+          <p class="hero-text">Software Engineer with 2+ years of experience architecting high-scale FinTech payment systems and distributed microservices using Java 17, Spring Boot, Kafka, Redis, and AWS. Proven track record in low-latency REST APIs, database tuning, DLQ messaging resiliency, and AI diagnostics across 50+ banking partners.</p>
           <div class="actions"><a class="btn primary" href="#projects">View selected work <span aria-hidden="true">↘</span></a><a class="btn secondary" href="https://drive.google.com/file/d/1UAiN7kRxYpltmuhkUAtIGARZMRg4_MQC/view?usp=sharing" target="_blank" rel="noopener noreferrer">View resume <span aria-hidden="true">↗</span></a></div>
           <a class="hero-link" href="https://www.linkedin.com/in/aman-malviya22/" target="_blank" rel="noreferrer">LinkedIn profile <span aria-hidden="true">↗</span></a>
         </div>
@@ -105,33 +103,33 @@ const projects = [
           <div class="stack-list"><span>Java</span><span>Spring Boot</span><span>Microservices</span><span>AWS</span><span>Redis</span><span>SQL</span><span>Docker</span><span>Kubernetes</span></div>
           <div class="panel-divider"></div>
           <div class="hero-metrics">
-            <div><strong>5K+</strong><span>daily transactions</span></div>
+            <div><strong>100K+</strong><span>daily transactions</span></div>
             <div><strong>50+</strong><span>banking partners</span></div>
-            <div><strong>99.99%+</strong><span>uptime</span></div>
+            <div><strong>99.99%+</strong><span>availability</span></div>
           </div>
         </aside>
       </div>
     </section>
 
-    <section class="impact-section" aria-label="Selected engineering impact">
+        <section class="impact-section" aria-label="Selected engineering impact">
       <div class="container impact-grid">
         <div class="impact-intro">
           <p class="label">SELECTED IMPACT</p>
           <p>Production improvements, not just features shipped.</p>
         </div>
         <article class="impact-stat">
-          <strong>~15%</strong>
+          <strong>15%</strong>
           <span>Higher payment success</span>
           <small>Automated validation</small>
         </article>
         <article class="impact-stat">
-          <strong>~40%</strong>
-          <span>Less manual intervention</span>
-          <small>Automated validation</small>
+          <strong>80%</strong>
+          <span>Fewer unproductive retries</span>
+          <small>DLQ isolation & SQS tuning</small>
         </article>
         <article class="impact-stat">
-          <strong>~30%</strong>
-          <span>Faster root-cause investigations</span>
+          <strong>30%</strong>
+          <span>Faster investigations</span>
           <small>Claude-powered MCP tooling</small>
         </article>
       </div>
@@ -216,14 +214,14 @@ const projects = [
         <div class="credentials-grid">
           <article class="credential-card">
             <p class="credential-type">EDUCATION</p>
-            <h3>B.Tech in Computer Science</h3>
+            <h3>B.Tech in Computer Science and Engineering</h3>
             <p>Shri Mata Vaishno Devi University</p>
             <span>2020 – 2024</span>
           </article>
           <article class="credential-card">
             <p class="credential-type">ACHIEVEMENT</p>
-            <h3>CodeChef · 4-star</h3>
-            <p>1654 points · Global Rank 2 in the November Long 2022 contest, Division 3 (Rated).</p>
+            <h3>CodeChef (4-Star, 1829)</h3>
+            <p>Global Rank 2 in the November Long Contest (Division 3, Rated).</p>
           </article>
         </div>
       </div>
